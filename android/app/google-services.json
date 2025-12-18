@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "218723643320",
+    "project_id": "mapsee-co",
+    "storage_bucket": "mapsee-co.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:218723643320:android:bed935686003302028a94d",
+        "android_client_info": {
+          "package_name": "in.co.mapsee"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArV8_AfnZTr1pXw1yn6TjZGLBqD0jI6jY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
