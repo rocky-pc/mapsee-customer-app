@@ -279,6 +279,7 @@ class Images {
   static const String tree2 = 'assets/image/tree2.png';
   static const String rushhours = 'assets/image/rushhours.png';
   static const String thunder = 'assets/image/thunder.png';
+  static const String thunder1 = 'assets/image/thunder1.png';
   static const String deliveryLocation = 'assets/image/delivery_location.svg';
   static const String enjoyIcon = 'assets/image/enjoy_image.svg';
   static const String confirmDineIn = 'assets/image/confirm_dine_in.gif';

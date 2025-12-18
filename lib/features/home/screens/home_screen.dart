@@ -488,6 +488,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         rainSpeed: 700,
                                                         rainColor: Colors
                                                             .blueGrey.shade100,
+                                                  thunder1XFactor: 0.2,   // 0.0 is far left, 1.0 is far right
+                                                  thunder1YOffset: -90.0,  // pixels from top
+                                                  thunder1Size: 320.0,    // pixel width/height
+
+                                                  // EDIT THESE TO MOVE/RESIZE THUNDER 2
+                                                  thunder2XFactor: 0.75,   // 0.0 is far left, 1.0 is far right
+                                                  thunder2YOffset: -90.0,  // pixels from top
+                                                  thunder2Size: 360.0,    // pixel width/height
                                                       )
                                                     : const SizedBox.shrink();
                                               }),

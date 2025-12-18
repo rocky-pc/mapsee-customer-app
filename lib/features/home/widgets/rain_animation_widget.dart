@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:stackfood_multivendor/util/images.dart';
 
 class RainAnimationWidget extends StatelessWidget {
   final double width;
@@ -13,6 +14,15 @@ class RainAnimationWidget extends StatelessWidget {
   final double minDropHeight;
   final double maxDropHeight;
 
+  // Editable Thunder Parameters
+  final double thunder1XFactor;
+  final double thunder1YOffset;
+  final double thunder1Size;
+
+  final double thunder2XFactor;
+  final double thunder2YOffset;
+  final double thunder2Size;
+
   const RainAnimationWidget({
     super.key,
     required this.width,
@@ -25,6 +35,13 @@ class RainAnimationWidget extends StatelessWidget {
     this.maxDropWidth = 4.5,
     this.minDropHeight = 30.0,
     this.maxDropHeight = 60.0,
+    // Default editables:
+    this.thunder1XFactor = 0.25, // Position 2
+    this.thunder1YOffset = 10.0,
+    this.thunder1Size = 280.0,
+    this.thunder2XFactor = 0.75, // Position 4
+    this.thunder2YOffset = 30.0,
+    this.thunder2Size = 320.0,
   });
 
   @override
@@ -34,7 +51,32 @@ class RainAnimationWidget extends StatelessWidget {
       height: height,
       child: ClipRect(
         child: Stack(
-          children: _buildRainLayers(),
+          children: [
+            // Thunder 1: Uses Images.thunder
+            ThunderWidget(
+              imagePath: Images.thunder,
+              top: thunder1YOffset,
+              centerX: width * thunder1XFactor,
+              size: thunder1Size,
+              isFlipped: false,
+              pauseDuration: const Duration(seconds: 2), // Adjusted for better atmosphere
+              initialDelay: const Duration(seconds: 1),
+            ),
+
+            // Background Rain layers
+            ..._buildRainLayers(),
+
+            // Thunder 2: Uses Images.thunder1
+            ThunderWidget(
+              imagePath: Images.thunder1,
+              top: thunder2YOffset,
+              centerX: width * thunder2XFactor,
+              size: thunder2Size,
+              isFlipped: true,
+              pauseDuration: const Duration(seconds: 3),
+              initialDelay: const Duration(seconds: 4),
+            ),
+          ],
         ),
       ),
     );
@@ -54,31 +96,21 @@ class RainAnimationWidget extends StatelessWidget {
 
   Widget _buildLayer(Random random, double angleRad, double tanAngle,
       {required double distanceFactor}) {
-    final int dropCount =
-    (width / 1000 * rainDensity / 3 * (1 / distanceFactor)).ceil();
-
+    final int dropCount = (width / 1000 * rainDensity / 3 * (1 / distanceFactor)).ceil();
     final double totalFallDistance = height + maxDropHeight * 2;
     final double horizontalShift = totalFallDistance * tanAngle;
-
     final List<Widget> drops = [];
 
     for (int i = 0; i < dropCount; i++) {
-      final double dropWidth =
-          (minDropWidth + random.nextDouble() * (maxDropWidth - minDropWidth)) / distanceFactor;
-      final double dropHeight = (minDropHeight +
-          random.nextDouble() * (maxDropHeight - minDropHeight)) /
-          distanceFactor;
-
+      final double dropWidth = (minDropWidth + random.nextDouble() * (maxDropWidth - minDropWidth)) / distanceFactor;
+      final double dropHeight = (minDropHeight + random.nextDouble() * (maxDropHeight - minDropHeight)) / distanceFactor;
       final double speedVariation = 0.8 + random.nextDouble() * 0.4;
       final double effectiveSpeed = rainSpeed * speedVariation / distanceFactor;
-
       final double fallDistance = height + dropHeight * 4;
       final double durationSec = fallDistance / effectiveSpeed;
       final double delaySec = random.nextDouble() * durationSec;
-
       final double spawnRange = width + horizontalShift.abs();
       final double left = (random.nextDouble() * spawnRange) - (horizontalShift > 0 ? horizontalShift : 0);
-
       final double opacity = (0.2 + random.nextDouble() * 0.4) / distanceFactor;
 
       drops.add(
@@ -98,8 +130,90 @@ class RainAnimationWidget extends StatelessWidget {
         ),
       );
     }
-
     return Stack(children: drops);
+  }
+}
+
+class ThunderWidget extends StatefulWidget {
+  final String imagePath; // Added to support different images
+  final double centerX;
+  final double top;
+  final double size;
+  final bool isFlipped;
+  final Duration pauseDuration;
+  final Duration initialDelay;
+
+  const ThunderWidget({
+    super.key,
+    required this.imagePath,
+    required this.centerX,
+    required this.top,
+    required this.size,
+    required this.isFlipped,
+    required this.pauseDuration,
+    required this.initialDelay,
+  });
+
+  @override
+  State<ThunderWidget> createState() => _ThunderWidgetState();
+}
+
+class _ThunderWidgetState extends State<ThunderWidget> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _opacity;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 900));
+
+    _opacity = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.0), weight: 10), // Sudden Flash
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.2), weight: 10), // Quick dim
+      TweenSequenceItem(tween: Tween(begin: 0.2, end: 1.0), weight: 15), // Re-brighten
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.0), weight: 65), // Fade away
+    ]).animate(_controller);
+
+    _startCycle();
+  }
+
+  void _startCycle() async {
+    await Future.delayed(widget.initialDelay);
+    if (mounted) _playStrike();
+  }
+
+  void _playStrike() async {
+    if (!mounted) return;
+    _controller.forward(from: 0);
+    await Future.delayed(widget.pauseDuration);
+    _playStrike();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      left: widget.centerX - (widget.size / 2),
+      top: widget.top,
+      child: FadeTransition(
+        opacity: _opacity,
+        child: Transform(
+          alignment: Alignment.center,
+          transform: Matrix4.rotationY(widget.isFlipped ? pi : 0),
+          child: Image.asset(
+            widget.imagePath,
+            width: widget.size,
+            height: widget.size,
+            fit: BoxFit.contain,
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -129,8 +243,7 @@ class RainDrop extends StatefulWidget {
   State<RainDrop> createState() => _RainDropState();
 }
 
-class _RainDropState extends State<RainDrop>
-    with SingleTickerProviderStateMixin {
+class _RainDropState extends State<RainDrop> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
 
@@ -178,7 +291,6 @@ class _RainDropState extends State<RainDrop>
 
 class RoundedTeardropPainter extends CustomPainter {
   final Color color;
-
   RoundedTeardropPainter({required this.color});
 
   @override
@@ -200,12 +312,9 @@ class RoundedTeardropPainter extends CustomPainter {
     path.lineTo(size.width, size.height - (size.width / 2));
     path.arcTo(
       Rect.fromLTWH(0, size.height - size.width, size.width, size.width),
-      0,
-      pi,
-      false,
+      0, pi, false,
     );
     path.close();
-
     canvas.drawPath(path, paint);
   }
 
