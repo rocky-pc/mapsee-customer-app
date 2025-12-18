@@ -485,7 +485,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         height: 160,
                                                         rainDensity: 200,
                                                         rainAngle: 27,
-                                                        rainSpeed: 700,
+                                                        rainSpeed: 600,
                                                         rainColor: Colors
                                                             .blueGrey.shade100,
                                                   thunder1XFactor: 0.2,   // 0.0 is far left, 1.0 is far right
