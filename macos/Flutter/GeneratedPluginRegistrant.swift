@@ -24,7 +24,7 @@ import share_plus
 import shared_preferences_foundation
 import sign_in_with_apple
 import speech_to_text
-import sqflite
+import sqflite_darwin
 import sqlite3_flutter_libs
 import url_launcher_macos
 import video_player_avfoundation

@@ -152,17 +152,17 @@ class RestaurantView extends StatelessWidget {
           }
 
           if (activeCoupon != null) {
-            discountText = activeCoupon.discountType == 'percent'
+            discountText = activeCoupon.discountType == 'Percent'
                 ? '${formatValue(activeCoupon.discount as num)}% ${'off'.tr}'
-                : '${formatValue(activeCoupon.discount as num)} ${'off'.tr}';
+                : '₹${formatValue(activeCoupon.discount as num)} ${'off'.tr}';
             if (activeCoupon.maxDiscount != null && activeCoupon.maxDiscount! > 0) {
-              discountText = 'Up to ${formatValue(activeCoupon.maxDiscount!)} ${'off'.tr}';
+              discountText = 'Up to ₹${formatValue(activeCoupon.maxDiscount!)} ${'off'.tr}';
             }
           } else if (couponList.isNotEmpty) {
             final first = couponList[0];
-            discountText = first.discountType == 'percent'
+            discountText = first.discountType == 'Percent'
                 ? '${formatValue(first.discount as num)}% ${'off'.tr}'
-                : '${formatValue(first.discount as num)} ${'off'.tr}';
+                : '₹${formatValue(first.discount as num)} ${'off'.tr}';
           }
           hasLiveCoupon = true;
         }
