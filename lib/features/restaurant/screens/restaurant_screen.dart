@@ -78,7 +78,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
         BoxShadow(
           color: Colors.deepOrange.withOpacity(0.5),
           blurRadius: 10,
-          offset: const Offset(0, 4),
+          offset: const Offset(0, 1),
           spreadRadius: 1,
         ),
       ],
@@ -232,7 +232,6 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                           ),
                           const Divider(thickness: 0.2, height: 10),
 
-                          // Horizontal Category List
                           Expanded(
                             child: ListView.builder(
                               scrollDirection: Axis.horizontal,
@@ -241,53 +240,68 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                               itemCount: restController.categoryList!.length,
                               itemBuilder: (context, index) {
                                 final category = restController.categoryList![index];
-                                final bool isAllCategory = index == 0; // Usually "All" is first
                                 final bool isSelected = index == restController.categoryIndex;
+                                const double imageSize = 30; // Consistent height reference
 
-                                // "All" category - text only
-                                if (isAllCategory) {
-                                  return InkWell(
-                                    onTap: () => restController.setCategoryIndex(index),
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: Dimensions.paddingSizeDefault,
-                                          vertical: Dimensions.paddingSizeExtraSmall),
-                                      margin: const EdgeInsets.only(right: Dimensions.paddingSizeSmall),
-                                      decoration: BoxDecoration(
-                                        color: isSelected
-                                            ? Theme.of(context).primaryColor.withOpacity(0.1)
-                                            : Colors.transparent,
-                                        borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          category.name!,
-                                          style: robotoMedium.copyWith(
-                                            fontSize: Dimensions.fontSizeSmall,
-                                            color: isSelected
-                                                ? Theme.of(context).primaryColor
-                                                : Theme.of(context).textTheme.bodyLarge?.color,
+                                // 1. "ALL" CATEGORY REDESIGN
+                                if (index == 0) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: Dimensions.paddingSizeDefault),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        // This InkWell now only wraps the "Text Box" area
+                                        InkWell(
+                                          onTap: () => restController.setCategoryIndex(index),
+                                          borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                                          child: Container(
+                                            height: imageSize, // Match the height of the other categories' images
+                                            padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
+                                            decoration: BoxDecoration(
+                                              color: isSelected
+                                                  ? Theme.of(context).primaryColor.withOpacity(0.1)
+                                                  : Colors.transparent,
+                                              borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                                              border: Border.all(
+                                                color: isSelected ? Theme.of(context).primaryColor : Colors.grey.withOpacity(0.2),
+                                                width: 1,
+                                              ),
+                                            ),
+                                            child: Center(
+                                              child: Text(
+                                                category.name!,
+                                                style: robotoMedium.copyWith(
+                                                  fontSize: Dimensions.fontSizeSmall,
+                                                  color: isSelected
+                                                      ? Theme.of(context).primaryColor
+                                                      : Theme.of(context).textTheme.bodyLarge?.color,
+                                                ),
+                                              ),
+                                            ),
                                           ),
                                         ),
-                                      ),
+                                        // Empty space at bottom to maintain alignment with other category labels
+                                        const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+                                        const SizedBox(height: 10), // Placeholder for the missing label height
+                                      ],
                                     ),
                                   );
                                 }
 
-                                // Other categories - image + name with photo frame
-                                double size = 45;
-                                double framePadding = 4;
-
+                                // 2. OTHER CATEGORIES
                                 return InkWell(
                                   onTap: () => restController.setCategoryIndex(index),
                                   child: Padding(
                                     padding: const EdgeInsets.only(
-                                        right: Dimensions.paddingSizeDefault, top: 3, bottom: 3),
+                                      right: Dimensions.paddingSizeDefault,
+                                      top: 3,
+                                      bottom: 3,
+                                    ),
                                     child: Column(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Container(
-                                          padding: EdgeInsets.all(framePadding),
+                                          // padding: const EdgeInsets.all(4),
                                           decoration: isSelected
                                               ? _photoFrameDecoration(context)
                                               : BoxDecoration(
@@ -295,18 +309,18 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                                             borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
                                           ),
                                           child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                                            borderRadius: BorderRadius.circular(Dimensions.radiusSmall +3),
                                             child: CustomImageWidget(
                                               image: category.imageFullUrl ?? '',
-                                              height: size,
-                                              width: size,
+                                              height: 70,
+                                              width: 70,
                                               fit: BoxFit.cover,
                                             ),
                                           ),
                                         ),
                                         const SizedBox(height: Dimensions.paddingSizeExtraSmall),
                                         SizedBox(
-                                          width: size + 10,
+                                          width: imageSize + 30,
                                           child: Text(
                                             category.name!,
                                             style: robotoMedium.copyWith(
@@ -315,7 +329,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                                                   ? Theme.of(context).primaryColor
                                                   : Theme.of(context).textTheme.bodyLarge?.color,
                                             ),
-                                            maxLines: 2,
+                                            maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                             textAlign: TextAlign.center,
                                           ),

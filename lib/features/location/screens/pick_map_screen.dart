@@ -1,6 +1,6 @@
 import 'package:stackfood_multivendor/common/widgets/custom_snackbar_widget.dart';
-import 'package:stackfood_multivendor/features/location/widgets/animated_map_icon_extended.dart';
-import 'package:stackfood_multivendor/features/location/widgets/animated_map_icon_minimized.dart';
+// import 'package:stackfood_multivendor/features/location/widgets/animated_map_icon_extended.dart';
+// import 'package:stackfood_multivendor/features/location/widgets/animated_map_icon_minimized.dart';
 import 'package:stackfood_multivendor/features/location/widgets/custom_floating_action_button.dart';
 import 'package:stackfood_multivendor/features/splash/controllers/splash_controller.dart';
 import 'package:stackfood_multivendor/features/address/domain/models/address_model.dart';
@@ -10,6 +10,7 @@ import 'package:stackfood_multivendor/features/location/widgets/permission_dialo
 import 'package:stackfood_multivendor/features/splash/controllers/theme_controller.dart';
 import 'package:stackfood_multivendor/helper/responsive_helper.dart';
 import 'package:stackfood_multivendor/util/dimensions.dart';
+import 'package:stackfood_multivendor/util/images.dart'; // <-- Added this import
 import 'package:stackfood_multivendor/common/widgets/custom_button_widget.dart';
 import 'package:stackfood_multivendor/common/widgets/web_menu_bar.dart';
 import 'package:flutter/material.dart';
@@ -94,10 +95,32 @@ class _PickMapScreenState extends State<PickMapScreen> {
               style: Get.isDarkMode ? Get.find<ThemeController>().darkMap : Get.find<ThemeController>().lightMap,
             ),
 
-            Center(child: Padding(
-              padding: const EdgeInsets.only(bottom: Dimensions.pickMapIconSize * 0.65),
-              child: locationController.isCameraMoving ? const AnimatedMapIconExtended() : const AnimatedMapIconMinimised(),
-            )),
+            // Custom location picker icon using Images.Icon1 from your util/images.dart
+            // The icon is centered, and padding is adjusted so the tip of the pin points exactly at the map center
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 40), // Adjust this value based on your icon height (tip should point to center)
+                child: Image.asset(
+                  Images.pickicon, // <-- Using your existing Images.Icon1
+                  width: 60,
+                  height: 80,
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+
+            // Optional: If you want to keep the original animated behavior when dragging,
+            // uncomment the block below and comment out the static Image.asset above.
+            /*
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: Dimensions.pickMapIconSize * 0.65),
+                child: locationController.isCameraMoving
+                    ? const AnimatedMapIconExtended()
+                    : const AnimatedMapIconMinimised(),
+              ),
+            ),
+            */
 
             Positioned(
               top: Dimensions.paddingSizeLarge, left: Dimensions.paddingSizeSmall, right: Dimensions.paddingSizeSmall,
@@ -111,7 +134,7 @@ class _PickMapScreenState extends State<PickMapScreen> {
                 Container(
                   width: 40, height: 40,
                   decoration: BoxDecoration(shape: BoxShape.circle,
-                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 6, spreadRadius: 0.5, offset: const Offset(0, 4))],
+                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 6, spreadRadius: 0.5, offset: const Offset(0, 4))],
                   ),
                   child: FloatingActionButton(
                     mini: true, backgroundColor: Theme.of(context).cardColor,
@@ -126,7 +149,7 @@ class _PickMapScreenState extends State<PickMapScreen> {
                 Container(
                   decoration: BoxDecoration(
                     color: Theme.of(context).cardColor,
-                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 6, spreadRadius: 0.5, offset: const Offset(0, 4))],
+                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 6, spreadRadius: 0.5, offset: const Offset(0, 4))],
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Column(children: [
@@ -140,7 +163,7 @@ class _PickMapScreenState extends State<PickMapScreen> {
 
                     Container(
                       width: 20, height: 1,
-                      color: Theme.of(context).disabledColor.withValues(alpha: 0.5),
+                      color: Theme.of(context).disabledColor.withOpacity(0.5),
                     ),
 
                     CustomFloatingActionButton(
@@ -150,12 +173,8 @@ class _PickMapScreenState extends State<PickMapScreen> {
                         _mapController?.animateCamera(CameraUpdate.zoomTo(_currentZoomLevel));
                       },
                     ),
-
-
                   ]),
                 ),
-
-
               ]),
             ),
 
@@ -165,7 +184,7 @@ class _PickMapScreenState extends State<PickMapScreen> {
                 buttonText: locationController.inZone ? widget.fromAddAddress ? 'pick_address'.tr : 'set_location'.tr
                     : 'service_not_available_in_this_area'.tr,
                 isLoading: locationController.isLoading,
-                onPressed: (locationController.buttonDisabled || locationController.loading) ? null
+                onPressed: (locationController.buttonDisabled || locationController.isLoading) ? null
                     : () => _onPickAddressButtonPressed(locationController),
               ),
             ),

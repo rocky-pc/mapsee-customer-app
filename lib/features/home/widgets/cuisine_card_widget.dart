@@ -61,7 +61,7 @@ class CuisineCardWidget extends StatelessWidget {
     ) : Stack(children: [
 
         Positioned(
-          bottom: 25, left: 0, right: 0,
+          bottom: 20, left: 0, right: 0,
           child: CustomPaint(
             size: const Size(150, 50),
             painter: MyPainter(),
@@ -69,16 +69,16 @@ class CuisineCardWidget extends StatelessWidget {
         ),
 
         Padding(
-          padding: const EdgeInsets.only(bottom: 10, left: 5, right: 5),
+          padding: const EdgeInsets.only(bottom: 20, left: 2, right: 0),
           child: Container(
             decoration: BoxDecoration(
               color: Theme.of(context).cardColor,
-              borderRadius: BorderRadius.circular(100),
+              borderRadius: BorderRadius.circular(20),
             ),
             child: ClipOval(
               child: CustomImageWidget(
                 image: image,
-                fit: BoxFit.cover, height: fromSearchPage || fromCuisinesPage ? 100 : 70, width: fromSearchPage || fromCuisinesPage ? 100 : 70,
+                fit: BoxFit.cover, height: fromSearchPage || fromCuisinesPage ? 110 : 70, width: fromSearchPage || fromCuisinesPage ? 110 : 70,
               ),
             ),
           ),
@@ -88,15 +88,15 @@ class CuisineCardWidget extends StatelessWidget {
           bottom: 0, left: 0, right: 0,
           child: Container(
             alignment: Alignment.center,
-            height: 25, width: 120,
-            padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraSmall),
+            height: 20, width: 180,
+            padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
             decoration: BoxDecoration(
               color: Theme.of(context).cardColor,
               boxShadow: [BoxShadow(color: Colors.grey[Get.find<ThemeController>().darkTheme ? 700 : 300]!, spreadRadius: 0.5, blurRadius: 0.5)],
               borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(Dimensions.radiusDefault), bottomRight: Radius.circular(Dimensions.radiusDefault)),
             ),
-            child: Text( name, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall),
-              maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center,
+            child: Text( name, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeExtraSmall),
+              maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.start,
             ),
           ),
         ),

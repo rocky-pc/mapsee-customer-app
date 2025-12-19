@@ -33,8 +33,8 @@ class ApiClient extends GetxService {
       addressModel = AddressModel.fromJson(jsonDecode(sharedPreferences.getString(AppConstants.userAddress)!));
     }catch(_) {}
     updateHeader(
-      token, addressModel?.zoneIds,
-      sharedPreferences.getString(AppConstants.languageCode), addressModel?.latitude,
+        token, addressModel?.zoneIds,
+        sharedPreferences.getString(AppConstants.languageCode), addressModel?.latitude,
         addressModel?.longitude
     );
   }
@@ -58,6 +58,11 @@ class ApiClient extends GetxService {
   Map<String, String> getHeader() => _mainHeaders;
 
   Future<Response> getData(String uri, {Map<String, dynamic>? query, Map<String, String>? headers, bool handleError = true, bool showToaster = false}) async {
+    // PREVENT API CALL IF LAT/LNG IS 0.0 TO REDUCE SERVER LOAD AND LOG NOISE
+    if(uri.contains('geocode-api?lat=0.0&lng=0.0')) {
+      return const Response(statusCode: 200, body: {'results': [], 'status': 'ZERO_RESULTS'});
+    }
+
     try {
       if(kDebugMode) {
         debugPrint('====> API Call: $uri\nHeader: $_mainHeaders');
@@ -71,7 +76,7 @@ class ApiClient extends GetxService {
       if (kDebugMode) {
         print('----------------${e.toString()}');
       }
-      return  Response(statusCode: 1, statusText: noInternetMessage);
+      return Response(statusCode: 1, statusText: noInternetMessage);
     }
   }
 
@@ -203,13 +208,23 @@ class ApiClient extends GetxService {
     }else if(response0.statusCode != 200 && response0.body == null) {
       response0 = Response(statusCode: 0, statusText: noInternetMessage);
     }
+
     if(kDebugMode) {
-      if(response0.statusCode == 500) {
-        debugPrint('====> API Response: [${response0.statusCode}] $uri\n${(response0.body.toString().substring(0, 500))}');
-      } else {
-        debugPrint('====> API Response: [${response0.statusCode}] $uri\n${response0.body}');
+      // CHECK IF RESPONSE IS A "ZERO_RESULTS" GEOCODE TO SUPPRESS LOGGING
+      bool isZeroGeocode = uri.contains('geocode-api') &&
+          response0.body != null &&
+          response0.body is Map &&
+          response0.body['status'] == 'ZERO_RESULTS';
+
+      if(!isZeroGeocode) {
+        if(response0.statusCode == 500) {
+          debugPrint('====> API Response: [${response0.statusCode}] $uri\n${(response0.body.toString().substring(0, 500))}');
+        } else {
+          debugPrint('====> API Response: [${response0.statusCode}] $uri\n${response0.body}');
+        }
       }
     }
+
     if(handleError) {
       if(response0.statusCode == 200) {
         return response0;
@@ -226,7 +241,6 @@ class ApiClient extends GetxService {
 class MultipartBody {
   String key;
   XFile? file;
-
   MultipartBody(this.key, this.file);
 }
 
@@ -236,15 +250,11 @@ class MultipartDocument {
   MultipartDocument(this.key, this.file);
 }
 
-/// errors : [{"code":"l_name","message":"The last name field is required."},{"code":"password","message":"The password field is required."}]
-
 class ErrorResponse {
   List<Errors>? _errors;
-
   List<Errors>? get errors => _errors;
 
-  ErrorResponse({
-    List<Errors>? errors}){
+  ErrorResponse({List<Errors>? errors}){
     _errors = errors;
   }
 
@@ -264,22 +274,15 @@ class ErrorResponse {
     }
     return map;
   }
-
 }
-
-/// code : "l_name"
-/// message : "The last name field is required."
 
 class Errors {
   String? _code;
   String? _message;
-
   String? get code => _code;
   String? get message => _message;
 
-  Errors({
-    String? code,
-    String? message}){
+  Errors({String? code, String? message}){
     _code = code;
     _message = message;
   }
@@ -295,5 +298,4 @@ class Errors {
     map["message"] = _message;
     return map;
   }
-
 }
