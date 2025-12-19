@@ -284,6 +284,7 @@ class Images {
   static const String enjoyIcon = 'assets/image/enjoy_image.svg';
   static const String confirmDineIn = 'assets/image/confirm_dine_in.gif';
   static const String bike = 'assets/image/bike.png';
+  static const String plane = 'assets/image/plane.png';
   static const String pickicon = 'assets/image/pick_icon.png';
   static const String car = 'assets/image/car.png';
   static const String truck = 'assets/image/truck.png';

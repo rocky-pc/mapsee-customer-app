@@ -35,20 +35,20 @@ class RainAnimationWidget extends StatelessWidget {
     this.maxDropWidth = 4.5,
     this.minDropHeight = 30.0,
     this.maxDropHeight = 60.0,
-    // Default editables:
-    this.thunder1XFactor = 0.25, // Position 2
+    this.thunder1XFactor = 0.25,
     this.thunder1YOffset = 10.0,
     this.thunder1Size = 280.0,
-    this.thunder2XFactor = 0.75, // Position 4
+    this.thunder2XFactor = 0.75,
     this.thunder2YOffset = 30.0,
     this.thunder2Size = 320.0,
   });
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return Container(
       width: width,
       height: height,
+      color: Colors.black, // This sets the background color to black
       child: ClipRect(
         child: Stack(
           children: [
@@ -59,7 +59,7 @@ class RainAnimationWidget extends StatelessWidget {
               centerX: width * thunder1XFactor,
               size: thunder1Size,
               isFlipped: false,
-              pauseDuration: const Duration(seconds: 2), // Adjusted for better atmosphere
+              pauseDuration: const Duration(seconds: 2),
               initialDelay: const Duration(seconds: 1),
             ),
 
@@ -135,7 +135,7 @@ class RainAnimationWidget extends StatelessWidget {
 }
 
 class ThunderWidget extends StatefulWidget {
-  final String imagePath; // Added to support different images
+  final String imagePath;
   final double centerX;
   final double top;
   final double size;
@@ -168,10 +168,10 @@ class _ThunderWidgetState extends State<ThunderWidget> with SingleTickerProvider
     _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 900));
 
     _opacity = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.0), weight: 10), // Sudden Flash
-      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.2), weight: 10), // Quick dim
-      TweenSequenceItem(tween: Tween(begin: 0.2, end: 1.0), weight: 15), // Re-brighten
-      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.0), weight: 65), // Fade away
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.0), weight: 10),
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.2), weight: 10),
+      TweenSequenceItem(tween: Tween(begin: 0.2, end: 1.0), weight: 15),
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.0), weight: 65),
     ]).animate(_controller);
 
     _startCycle();
@@ -186,7 +186,7 @@ class _ThunderWidgetState extends State<ThunderWidget> with SingleTickerProvider
     if (!mounted) return;
     _controller.forward(from: 0);
     await Future.delayed(widget.pauseDuration);
-    _playStrike();
+    if (mounted) _playStrike();
   }
 
   @override

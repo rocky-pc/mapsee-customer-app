@@ -48,7 +48,6 @@ class QuickOptionsViewWidget extends StatelessWidget {
       {
         'name': 'Food',
         'image': Images.food,
-        // Special route for Food
         'route': RouteHelper.getAllRestaurantRoute(
             isRecentlyViewed ? 'recently_viewed' : 'popular'),
       },
