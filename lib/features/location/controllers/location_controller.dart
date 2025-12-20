@@ -14,11 +14,19 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:stackfood_multivendor/helper/route_helper.dart';
+import 'package:video_player/video_player.dart'; // Added this
 
 class LocationController extends GetxController implements GetxService {
   final LocationServiceInterface locationServiceInterface;
 
   LocationController({required this.locationServiceInterface});
+
+  // --- Video Player Variables ---
+  VideoPlayerController? _videoController;
+  VideoPlayerController? get videoController => _videoController;
+
+  bool _isVideoInitialized = false;
+  bool get isVideoInitialized => _isVideoInitialized;
 
   Position _position = Position(
       longitude: 0,
@@ -88,6 +96,29 @@ class LocationController extends GetxController implements GetxService {
   String? _weatherIconUrl;
   String? get weatherIconUrl => _weatherIconUrl;
 
+  @override
+  void onInit() {
+    super.onInit();
+    _initializeVideo();
+  }
+
+  @override
+  void onClose() {
+    _videoController?.dispose();
+    super.onClose();
+  }
+
+  void _initializeVideo() {
+    // Change this line in your LocationController
+    _videoController = VideoPlayerController.asset('assets/image/video.mp4')
+      ..initialize().then((_) {
+        _videoController?.setLooping(true);
+        _videoController?.setVolume(0); // Mute if it's a background animation
+        _isVideoInitialized = true;
+        update();
+      });
+  }
+
   void updateCameraMovingStatus(bool status) {
     _isCameraMoving = status;
     update();
@@ -156,11 +187,11 @@ class LocationController extends GetxController implements GetxService {
     await locationServiceInterface.getZone(lat, long);
     _inZone = responseModel.isSuccess;
     _zoneID = responseModel.zoneIds.isNotEmpty ? responseModel.zoneIds[0] : 0;
+
     if (updateInAddress && responseModel.isSuccess) {
       AddressModel? address = AddressHelper.getAddressFromSharedPref();
       if(address != null) {
         address.zoneData = responseModel.zoneData;
-        // Remove any stored 'zone updated' flags for zones that no longer have an active increase
         try {
           if (address.zoneUpdateAt != null) {
             final keysToRemove = <String>[];
@@ -180,7 +211,6 @@ class LocationController extends GetxController implements GetxService {
           }
         } catch (_) {}
 
-        // Add or refresh flags for zones where admin enabled increase and updated_at indicates a newer update
         try {
           for (final z in responseModel.zoneData) {
             if (z.increasedDeliveryFeeStatus == 1 && z.updatedAt != null) {
@@ -208,11 +238,21 @@ class LocationController extends GetxController implements GetxService {
               data.increaseDeliveryFeeMessage?.isNotEmpty == true,
         );
         _weatherIconUrl = zoneData?.icon;
+
+        // Logic to Play/Pause Video based on Weather URL
+        if(_weatherIconUrl == 'https://mapsee.co.in/icons/rain.png') {
+          _videoController?.play();
+        } else {
+          _videoController?.pause();
+        }
+
       } else {
         _weatherIconUrl = null;
+        _videoController?.pause();
       }
     } else {
       _weatherIconUrl = null;
+      _videoController?.pause();
     }
 
     if (markerLoad) {
@@ -422,13 +462,11 @@ class LocationController extends GetxController implements GetxService {
   }
 
   Future<void> updateZone() async {
-    // Try to refresh zone data using the saved address coordinates so UI updates immediately
     final savedAddress = AddressHelper.getAddressFromSharedPref();
     if (savedAddress != null) {
       await getZone(savedAddress.latitude, savedAddress.longitude, false,
           updateInAddress: true);
     } else {
-      // Fallback: call the API endpoint if no saved address is available
       await locationServiceInterface.updateZone();
     }
   }

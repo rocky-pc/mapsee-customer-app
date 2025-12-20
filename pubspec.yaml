@@ -58,7 +58,7 @@ dependencies:
   custom_info_window: ^1.0.1
   flutter_widget_from_html_core: ^0.17.0
   smooth_page_indicator: ^1.2.1
-  video_player: ^2.10.0
+  video_player: ^2.10.1
   chewie: ^1.13.0
   location: ^8.0.1
   permission_handler: ^12.0.1
@@ -80,18 +80,19 @@ flutter:
 
   assets:
     - assets/image/
+    - assets/image/video.mp4
     - assets/language/
     - assets/map/
     - assets/json/
 
   fonts:
-    - family: Roboto
+    - family: Poppins
       fonts:
-        - asset: assets/font/Roboto-Regular.ttf
+        - asset: assets/font/Poppins-Regular.ttf
           weight: 400
-        - asset: assets/font/Roboto-Medium.ttf
+        - asset: assets/font/Poppins-Medium.ttf
           weight: 500
-        - asset: assets/font/Roboto-Bold.ttf
+        - asset: assets/font/Poppins-Bold.ttf
           weight: 700
-        - asset: assets/font/Roboto-Black.ttf
+        - asset: assets/font/Poppins-Black.ttf
           weight: 900

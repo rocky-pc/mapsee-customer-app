@@ -278,6 +278,7 @@ class Images {
   static const String tree1 = 'assets/image/tree1.png';
   static const String tree2 = 'assets/image/tree2.png';
   static const String rushhours = 'assets/image/rushhours.png';
+  static const String video = 'assets/image/video.mp4';
   static const String thunder = 'assets/image/thunder.png';
   static const String thunder1 = 'assets/image/thunder1.png';
   static const String deliveryLocation = 'assets/image/delivery_location.svg';

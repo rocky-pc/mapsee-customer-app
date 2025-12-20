@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/rendering.dart';
 import 'package:stackfood_multivendor/common/widgets/menu_drawer_widget.dart';
+import 'package:video_player/video_player.dart';
 import 'package:stackfood_multivendor/features/dine_in/controllers/dine_in_controller.dart';
 import 'package:stackfood_multivendor/features/home/controllers/advertisement_controller.dart';
 import 'package:stackfood_multivendor/features/home/widgets/cashback_dialog_widget.dart';
@@ -471,32 +472,21 @@ class _HomeScreenState extends State<HomeScreen> {
                                           child: Stack(
                                             children: [
                                               // Rain Animation Layer (behind content)
-                                              GetBuilder<LocationController>(
-                                                  builder:
-                                                      (locationController) {
-                                                return locationController
-                                                            .weatherIconUrl ==
-                                                        'https://mapsee.co.in/icons/rain.png'
-                                                    ? RainAnimationWidget(
-                                                        width: MediaQuery.of(
-                                                                context)
-                                                            .size
-                                                            .width,
-                                                        height: 160,
-                                                        rainDensity: 300,
-                                                        rainAngle: 27,
-                                                        rainSpeed: 900,
-                                                        rainColor: Colors
-                                                            .blueGrey.shade100,
-                                                  thunder1XFactor: 0.2,   // 0.0 is far left, 1.0 is far right
-                                                  thunder1YOffset: -90.0,  // pixels from top
-                                                  thunder1Size: 320.0,    // pixel width/height
-
-                                                  // EDIT THESE TO MOVE/RESIZE THUNDER 2
-                                                  thunder2XFactor: 0.75,   // 0.0 is far left, 1.0 is far right
-                                                  thunder2YOffset: -90.0,  // pixels from top
-                                                  thunder2Size: 360.0,    // pixel width/height
-                                                      )
+                                              GetBuilder<LocationController>(builder: (locationController) {
+                                                return (locationController.weatherIconUrl == 'https://mapsee.co.in/icons/rain.png' &&
+                                                    locationController.isVideoInitialized)
+                                                    ? SizedBox(
+                                                  width: MediaQuery.of(context).size.width,
+                                                  height: 150,
+                                                  child: FittedBox(
+                                                    fit: BoxFit.cover,
+                                                    child: SizedBox(
+                                                      width: locationController.videoController!.value.size.width,
+                                                      height: locationController.videoController!.value.size.height,
+                                                      child: VideoPlayer(locationController.videoController!),
+                                                    ),
+                                                  ),
+                                                )
                                                     : const SizedBox.shrink();
                                               }),
                                               // Balloon Animation Layer (festive animation)

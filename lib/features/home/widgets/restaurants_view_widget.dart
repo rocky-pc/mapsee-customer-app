@@ -16,7 +16,8 @@ import 'package:stackfood_multivendor/common/widgets/custom_image_widget.dart';
 import 'package:stackfood_multivendor/common/widgets/custom_snackbar_widget.dart';
 import 'package:stackfood_multivendor/features/restaurant/screens/restaurant_screen.dart';
 import 'package:stackfood_multivendor/features/coupon/controllers/coupon_controller.dart';
-import 'package:stackfood_multivendor/features/coupon/domain/models/coupon_model.dart' as cm;
+import 'package:stackfood_multivendor/features/coupon/domain/models/coupon_model.dart'
+    as cm;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -32,67 +33,68 @@ class RestaurantsViewWidget extends StatelessWidget {
       width: Dimensions.webMaxWidth,
       child: restaurants != null
           ? restaurants!.isNotEmpty
-          ? GridView.builder(
-        shrinkWrap: true,
-        itemCount: restaurants!.length,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: ResponsiveHelper.isMobile(context)
-              ? 1
-              : ResponsiveHelper.isTab(context)
-              ? 3
-              : 4,
-          mainAxisSpacing: Dimensions.paddingSizeLarge,
-          crossAxisSpacing: Dimensions.paddingSizeLarge,
-          mainAxisExtent: 235, // DECREASED FROM 250 TO 230
-        ),
-        padding: EdgeInsets.symmetric(
-            horizontal: !ResponsiveHelper.isDesktop(context)
-                ? Dimensions.paddingSizeDefault
-                : 0),
-        itemBuilder: (context, index) {
-          return RestaurantView(restaurant: restaurants![index]!);
-        },
-      )
-          : Center(
-        child: Padding(
-          padding: const EdgeInsets.only(
-              top: Dimensions.paddingSizeOverLarge),
-          child: Column(
-            children: [
-              const SizedBox(height: 110),
-              const CustomAssetImageWidget(Images.emptyRestaurant,
-                  height: 80, width: 80),
-              const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-              Text('there_is_no_restaurant'.tr,
-                  style: robotoMedium.copyWith(
-                      color: Theme.of(context).disabledColor)),
-            ],
-          ),
-        ),
-      )
+              ? GridView.builder(
+                  shrinkWrap: true,
+                  itemCount: restaurants!.length,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: ResponsiveHelper.isMobile(context)
+                        ? 1
+                        : ResponsiveHelper.isTab(context)
+                            ? 3
+                            : 4,
+                    mainAxisSpacing: Dimensions.paddingSizeLarge,
+                    crossAxisSpacing: Dimensions.paddingSizeLarge,
+                    mainAxisExtent: 235, // DECREASED FROM 250 TO 230
+                  ),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: !ResponsiveHelper.isDesktop(context)
+                          ? Dimensions.paddingSizeDefault
+                          : 0),
+                  itemBuilder: (context, index) {
+                    return RestaurantView(restaurant: restaurants![index]!);
+                  },
+                )
+              : Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                        top: Dimensions.paddingSizeOverLarge),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 110),
+                        const CustomAssetImageWidget(Images.emptyRestaurant,
+                            height: 80, width: 80),
+                        const SizedBox(
+                            height: Dimensions.paddingSizeExtraSmall),
+                        Text('there_is_no_restaurant'.tr,
+                            style: robotoMedium.copyWith(
+                                color: Theme.of(context).disabledColor)),
+                      ],
+                    ),
+                  ),
+                )
           : GridView.builder(
-        shrinkWrap: true,
-        itemCount: 12,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: ResponsiveHelper.isMobile(context)
-              ? 1
-              : ResponsiveHelper.isTab(context)
-              ? 3
-              : 4,
-          mainAxisSpacing: Dimensions.paddingSizeLarge,
-          crossAxisSpacing: Dimensions.paddingSizeLarge,
-          mainAxisExtent: 230, // DECREASED FROM 250 TO 230
-        ),
-        padding: EdgeInsets.symmetric(
-            horizontal: !ResponsiveHelper.isDesktop(context)
-                ? Dimensions.paddingSizeLarge
-                : 0),
-        itemBuilder: (context, index) {
-          return const WebRestaurantShimmer();
-        },
-      ),
+              shrinkWrap: true,
+              itemCount: 12,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: ResponsiveHelper.isMobile(context)
+                    ? 1
+                    : ResponsiveHelper.isTab(context)
+                        ? 3
+                        : 4,
+                mainAxisSpacing: Dimensions.paddingSizeLarge,
+                crossAxisSpacing: Dimensions.paddingSizeLarge,
+                mainAxisExtent: 230, // DECREASED FROM 250 TO 230
+              ),
+              padding: EdgeInsets.symmetric(
+                  horizontal: !ResponsiveHelper.isDesktop(context)
+                      ? Dimensions.paddingSizeLarge
+                      : 0),
+              itemBuilder: (context, index) {
+                return const WebRestaurantShimmer();
+              },
+            ),
     );
   }
 }
@@ -143,7 +145,7 @@ class RestaurantView extends StatelessWidget {
         if (couponList != null && couponList.isNotEmpty) {
           try {
             activeCoupon = couponList.firstWhere((c) =>
-            c.startDate != null &&
+                c.startDate != null &&
                 c.expireDate != null &&
                 DateTime.now().isAfter(DateTime.parse(c.startDate!)) &&
                 DateTime.now().isBefore(DateTime.parse(c.expireDate!)));
@@ -155,8 +157,10 @@ class RestaurantView extends StatelessWidget {
             discountText = activeCoupon.discountType == 'Percent'
                 ? '${formatValue(activeCoupon.discount as num)}% ${'off'.tr}'
                 : '₹${formatValue(activeCoupon.discount as num)} ${'off'.tr}';
-            if (activeCoupon.maxDiscount != null && activeCoupon.maxDiscount! > 0) {
-              discountText = 'Up to ₹${formatValue(activeCoupon.maxDiscount!)} ${'off'.tr}';
+            if (activeCoupon.maxDiscount != null &&
+                activeCoupon.maxDiscount! > 0) {
+              discountText =
+                  'Up to ₹${formatValue(activeCoupon.maxDiscount!)} ${'off'.tr}';
             }
           } else if (couponList.isNotEmpty) {
             final first = couponList[0];
@@ -167,8 +171,8 @@ class RestaurantView extends StatelessWidget {
           hasLiveCoupon = true;
         }
 
-        bool isPureVeg = restaurant.veg == true;
-        bool isNonVeg = restaurant.nonVeg == true;
+        bool isPureVeg = restaurant.veg == 1;
+        bool isNonVeg = restaurant.nonVeg == 1;
 
         return Container(
           decoration: BoxDecoration(
@@ -188,7 +192,7 @@ class RestaurantView extends StatelessWidget {
           ),
           child: CustomInkWellWidget(
             onTap: onTap ??
-                    () {
+                () {
                   if (restaurant.restaurantStatus == 1) {
                     Get.toNamed(RouteHelper.getRestaurantRoute(restaurant.id),
                         arguments: RestaurantScreen(restaurant: restaurant));
@@ -242,13 +246,17 @@ class RestaurantView extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.error.withOpacity(0.9),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .error
+                            .withOpacity(0.9),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
                         'closed_now'.tr,
                         style: robotoMedium.copyWith(
-                            color: Colors.white, fontSize: Dimensions.fontSizeSmall),
+                            color: Colors.white,
+                            fontSize: Dimensions.fontSizeSmall),
                       ),
                     ),
                   ),
@@ -257,8 +265,10 @@ class RestaurantView extends StatelessWidget {
                 Positioned(
                   top: Dimensions.paddingSizeSmall,
                   right: Dimensions.paddingSizeSmall,
-                  child: GetBuilder<FavouriteController>(builder: (favouriteController) {
-                    bool isWished = favouriteController.wishRestIdList.contains(restaurant.id);
+                  child: GetBuilder<FavouriteController>(
+                      builder: (favouriteController) {
+                    bool isWished = favouriteController.wishRestIdList
+                        .contains(restaurant.id);
                     return CustomFavouriteWidget(
                       isWished: isWished,
                       isRestaurant: true,
@@ -277,11 +287,13 @@ class RestaurantView extends StatelessWidget {
                       height: 25,
                       color: Theme.of(context).cardColor,
                       alignment: Alignment.center,
-                      padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: Dimensions.paddingSizeDefault),
                       child: Text(
                         '${Get.find<RestaurantController>().getRestaurantDistance(
-                          LatLng(double.parse(restaurant.latitude!), double.parse(restaurant.longitude!)),
-                        ).toStringAsFixed(2)} km',
+                              LatLng(double.parse(restaurant.latitude!),
+                                  double.parse(restaurant.longitude!)),
+                            ).toStringAsFixed(2)} km',
                         style: robotoMedium.copyWith(
                             fontSize: Dimensions.fontSizeExtraSmall,
                             color: Theme.of(context).primaryColor),
@@ -299,12 +311,20 @@ class RestaurantView extends StatelessWidget {
                     width: 40,
                     decoration: BoxDecoration(
                       color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-                      border: Border.all(color: Theme.of(context).disabledColor.withOpacity(0.3), width: 1.5),
-                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4)],
+                      borderRadius:
+                          BorderRadius.circular(Dimensions.radiusSmall),
+                      border: Border.all(
+                          color:
+                              Theme.of(context).disabledColor.withOpacity(0.3),
+                          width: 1.5),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.black.withOpacity(0.1), blurRadius: 4)
+                      ],
                     ),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                      borderRadius:
+                          BorderRadius.circular(Dimensions.radiusSmall),
                       child: CustomImageWidget(
                         image: restaurant.logoFullUrl ?? '',
                         fit: BoxFit.cover,
@@ -330,7 +350,8 @@ class RestaurantView extends StatelessWidget {
                           Expanded(
                             child: Text(
                               restaurant.name ?? '',
-                              style: robotoBold.copyWith(fontSize: 15, color: Colors.black87),
+                              style: robotoBold.copyWith(
+                                  fontSize: 15, color: Colors.black87),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -338,27 +359,35 @@ class RestaurantView extends StatelessWidget {
                           const SizedBox(width: 8),
 
                           // Veg / Non-Veg Badges
-                          if (isPureVeg )
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: Colors.green.withOpacity(0.1),
-                                border: Border.all(color: Colors.green, width: 1),
-                                borderRadius: BorderRadius.circular(4),
+                          if (isPureVeg || isNonVeg) ...[
+                            if (isPureVeg)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: Colors.green.withOpacity(0.1),
+                                  border:
+                                      Border.all(color: Colors.green, width: 1),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text('Veg',
+                                    style: robotoMedium.copyWith(
+                                        color: Colors.green, fontSize: 10)),
                               ),
-                              child: Text('Veg', style: robotoMedium.copyWith(color: Colors.green, fontSize: 10)),
-                            ),
-                          if (isNonVeg) ...[
-                            const SizedBox(width: 4),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: Colors.red.withOpacity(0.1),
-                                border: Border.all(color: Colors.red, width: 1),
-                                borderRadius: BorderRadius.circular(4),
+                            if (isPureVeg && isNonVeg) const SizedBox(width: 4),
+                            if (isNonVeg)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: Colors.red.withOpacity(0.1),
+                                  border: Border.all(color: Colors.red, width: 1),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text('Non-Veg',
+                                    style: robotoMedium.copyWith(
+                                        color: Colors.red, fontSize: 10)),
                               ),
-                              child: Text('Non-Veg', style: robotoMedium.copyWith(color: Colors.red, fontSize: 10)),
-                            ),
                           ],
 
                           if (restaurant.ratingCount! > 0) ...[
@@ -398,7 +427,9 @@ class RestaurantView extends StatelessWidget {
                             Row(
                               children: [
                                 // if (characteristics.isNotEmpty) const SizedBox(width: 12),
-                                Icon(Icons.access_time_filled, size: 14, color: Theme.of(context).primaryColor),
+                                Icon(Icons.access_time_filled,
+                                    size: 14,
+                                    color: Theme.of(context).primaryColor),
                                 const SizedBox(width: 4),
                                 Text(
                                   restaurant.deliveryTime!,
@@ -411,7 +442,8 @@ class RestaurantView extends StatelessWidget {
                           if (hasLiveCoupon) ...[
                             const Spacer(),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 3),
                               decoration: BoxDecoration(
                                 color: Colors.purple.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(6),
@@ -419,11 +451,13 @@ class RestaurantView extends StatelessWidget {
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.local_offer, size: 14, color: Colors.purple),
+                                  Icon(Icons.local_offer,
+                                      size: 14, color: Colors.purple),
                                   const SizedBox(width: 4),
                                   Text(
                                     discountText,
-                                    style: robotoBold.copyWith(fontSize: 11, color: Colors.purple),
+                                    style: robotoBold.copyWith(
+                                        fontSize: 11, color: Colors.purple),
                                   ),
                                 ],
                               ),
@@ -436,9 +470,12 @@ class RestaurantView extends StatelessWidget {
                               padding: const EdgeInsets.only(left: 10),
                               child: Row(
                                 children: [
-                                  Image.asset(Images.deliveryIcon, height: 16, width: 16),
+                                  Image.asset(Images.deliveryIcon,
+                                      height: 16, width: 16),
                                   const SizedBox(width: 4),
-                                  Text('free'.tr, style: robotoMedium.copyWith(fontSize: 11, color: Colors.green)),
+                                  Text('free'.tr,
+                                      style: robotoMedium.copyWith(
+                                          fontSize: 11, color: Colors.green)),
                                 ],
                               ),
                             ),
@@ -515,7 +552,7 @@ class WebRestaurantShimmer extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.grey[300],
                       borderRadius:
-                      BorderRadius.circular(Dimensions.radiusSmall),
+                          BorderRadius.circular(Dimensions.radiusSmall),
                     ),
                   ),
                 ),
@@ -533,7 +570,7 @@ class WebRestaurantShimmer extends StatelessWidget {
                 Shimmer(
                   child: Container(
                       height: 10,
-                      width:context.width * 0.4,
+                      width: context.width * 0.4,
                       color: Colors.grey[300]),
                 ),
                 const SizedBox(height: 10),
@@ -555,8 +592,8 @@ class WebRestaurantShimmer extends StatelessWidget {
           Positioned(
             top: Dimensions.paddingSizeSmall,
             right: Dimensions.paddingSizeSmall,
-            child: Icon(Icons.favorite, size: 20,
-                color: Theme.of(context).shadowColor),
+            child: Icon(Icons.favorite,
+                size: 20, color: Theme.of(context).shadowColor),
           ),
         ]),
       ),

@@ -6,7 +6,7 @@ class AppConstants {
   static const String appName = 'MapSee';
   static const double appVersion = 8.5; ///Flutter SDK: 3.35.7
 
-  static const String fontFamily = 'Roboto';
+  static const String fontFamily = 'Poppins';
   static const bool payInWevView = false;
   static const String webHostedUrl = 'https://stackfood-web.6amtech.com';
   static const bool useReactWebsite = false;
