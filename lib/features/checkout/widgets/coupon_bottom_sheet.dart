@@ -148,7 +148,7 @@ class _CouponBottomSheetState extends State<CouponBottomSheet> {
     );
 
     // Auto dismiss after 3 seconds
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 5), () {
       if (mounted && Navigator.canPop(context)) {
         Navigator.of(context).pop();
       }

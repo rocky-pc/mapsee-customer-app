@@ -18,7 +18,7 @@ class CustomInkWellWidget extends StatelessWidget {
         },
         borderRadius: BorderRadius.circular(radius ?? 0.0),
         highlightColor: highlightColor ?? Theme.of(context).primaryColor.withValues(alpha: 0.1),
-        hoverColor: Theme.of(context).primaryColor.withValues(alpha: 0.05),
+        hoverColor: Theme.of(context).primaryColor.withValues(alpha: 0.02),
         child: Padding(
           padding: padding!,
           child: child,

@@ -188,85 +188,71 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildSwiggyHeader(BuildContext context) {
     return Container(
       width: Dimensions.webMaxWidth,
-      padding: const EdgeInsets.only(
-          top: 10,
-          bottom: 10,
-          left: Dimensions.paddingSizeSmall,
-          right: Dimensions.paddingSizeSmall),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: Dimensions.paddingSizeSmall),
       decoration: BoxDecoration(
-        color:
-            Theme.of(context).primaryColor, // Changed to primaryColor (Orange)
+        color: Theme.of(context).primaryColor,
         borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(
-              Dimensions.radiusExtraLarge), // Applied Bottom Left Radius
-          bottomRight: Radius.circular(
-              Dimensions.radiusExtraLarge), // Applied Bottom Right Radius
+          bottomLeft: Radius.circular(Dimensions.radiusExtraLarge),
+          bottomRight: Radius.circular(Dimensions.radiusExtraLarge),
         ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Location
           Expanded(
             child: InkWell(
-              onTap: () =>
-                  Get.toNamed(RouteHelper.getAccessLocationRoute('home')),
+              onTap: () => Get.toNamed(RouteHelper.getAccessLocationRoute('home')),
               child: Padding(
-                padding:
-                    const EdgeInsets.only(right: Dimensions.paddingSizeSmall),
-                child: GetBuilder<LocationController>(
-                    builder: (locationController) {
-                  // Reusing location logic
-                  String addressText = AuthHelper.isLoggedIn() &&
-                          AddressHelper.getAddressFromSharedPref() != null
+                padding: const EdgeInsets.only(right: Dimensions.paddingSizeSmall),
+                child: GetBuilder<LocationController>(builder: (locationController) {
+
+                  // Get full address: "XR28+4C7, Annamalai Nagar, Puducherry..."
+                  String fullAddress = AuthHelper.isLoggedIn() &&
+                      AddressHelper.getAddressFromSharedPref() != null
                       ? AddressHelper.getAddressFromSharedPref()!.address!
                       : 'your_location'.tr;
-                  String subText = AuthHelper.isLoggedIn() &&
-                          AddressHelper.getAddressFromSharedPref() != null
-                      ? AddressHelper.getAddressFromSharedPref()!
-                          .addressType!
-                          .tr
-                      : 'your_sub_location'.tr;
+
+                  // Logic to extract the 2nd part (Annamalai Nagar)
+                  List<String> addressParts = fullAddress.split(',');
+                  String displayTitle;
+
+                  if (addressParts.length >= 2) {
+                    // If there is a 2nd part, use it and trim extra spaces
+                    displayTitle = addressParts[1].trim();
+                  } else {
+                    // Fallback to 1st part if 2nd doesn't exist
+                    displayTitle = addressParts[0].trim();
+                  }
 
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Annamalai Nagar (Location Name)
                       Row(
                         children: [
-                          Icon(CupertinoIcons.paperplane_fill,
+                          Icon(CupertinoIcons.location_fill,
                               size: 18, color: Theme.of(context).cardColor),
-                          const SizedBox(
-                              width: Dimensions.paddingSizeExtraSmall),
+                          const SizedBox(width: Dimensions.paddingSizeExtraSmall),
                           Flexible(
                             child: Text(
-                              AuthHelper.isLoggedIn() &&
-                                      AddressHelper
-                                              .getAddressFromSharedPref() !=
-                                          null
-                                  ? subText // Using addressType as main location name placeholder
-                                  : 'your_location'.tr,
+                              displayTitle, // Shows "Annamalai Nagar"
                               style: robotoMedium.copyWith(
                                   color: Theme.of(context).cardColor,
-                                  fontSize: Dimensions
-                                      .fontSizeLarge), // Text color changed to white
+                                  fontSize: Dimensions.fontSizeLarge, fontWeight: FontWeight.w600),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           Icon(Icons.keyboard_arrow_down,
-                              size: 20,
-                              color: Theme.of(context)
-                                  .cardColor), // Icon color changed to white
+                              size: 20, color: Theme.of(context).cardColor),
                         ],
                       ),
-                      // Puducherry, India (Address detail)
+
+                      // The original full address remains here
                       Text(
-                        addressText.tr,
+                        fullAddress,
                         style: robotoRegular.copyWith(
                             color: Theme.of(context).cardColor.withOpacity(0.8),
-                            fontSize: Dimensions
-                                .fontSizeExtraSmall), // Text color changed to lighter white
+                            fontSize: Dimensions.fontSizeExtraSmall),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -277,28 +263,22 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
 
-          // Bad Weather and Profile Icon (MODIFIED)
+          // Profile Section
           Row(
             children: [
-              // ADDED: Bad Weather Widget
               const BadWeatherWidget(),
               const SizedBox(width: Dimensions.paddingSizeSmall),
-
-              // Profile Icon
               InkWell(
                 onTap: () => Get.toNamed(RouteHelper.getProfileRoute()),
                 child: Container(
                   width: 35,
                   height: 35,
                   decoration: BoxDecoration(
-                    color: Theme.of(context)
-                        .cardColor, // Background changed to white
+                    color: Theme.of(context).cardColor,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.person,
-                      size: 20,
-                      color: Theme.of(context)
-                          .primaryColor), // Icon color changed to primaryColor (orange)
+                  child: Icon(Icons.person_sharp,
+                      size: 25, color: Theme.of(context).primaryColor),
                 ),
               ),
             ],
@@ -363,7 +343,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Icon(Icons.mic_rounded,
                       size: 25,
                       color: Theme.of(context)
-                          .disabledColor), // Kept Icons.mic_none as it is the closest standard icon
+                          .primaryColor), // Kept Icons.mic_none as it is the closest standard icon
                 ]),
               ),
             ),
