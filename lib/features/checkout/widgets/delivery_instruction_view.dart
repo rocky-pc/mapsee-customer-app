@@ -15,58 +15,114 @@ class DeliveryInstructionView extends StatefulWidget {
 }
 
 class _DeliveryInstructionViewState extends State<DeliveryInstructionView> {
-  // ExpansionTileController controller = ExpansionTileController();
-
   @override
   Widget build(BuildContext context) {
     bool isDesktop = ResponsiveHelper.isDesktop(context);
+
+    // Consistent Vibrant Theme Palette
+    const Color orangePrimary = Colors.orangeAccent;
+    final Color orangeShadow = Colors.orange.withOpacity(0.15); // Vibrant glow
+    final Color orangeBorder = Colors.orange.withOpacity(0.2);
+
     return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-        border: Border.all(color: Theme.of(context).primaryColor.withValues(alpha: 0.5), width: 0.5),
+      margin: const EdgeInsets.symmetric(
+        horizontal: Dimensions.paddingSizeDefault,
+        vertical: Dimensions.paddingSizeSmall,
       ),
-      padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
-      margin: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeSmall),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor, // Pure clean background
+        borderRadius: BorderRadius.circular(Dimensions.radiusLarge),
+        border: Border.all(color: orangeBorder, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: orangeShadow,
+            blurRadius: 15,
+            offset: const Offset(0, 8), // Matching the vibrant shadow theme
+          ),
+        ],
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           InkWell(
-            onTap: (){
-              if(isDesktop) {
+            onTap: () {
+              if (isDesktop) {
                 Get.dialog(const Dialog(child: DeliveryInstructionBottomSheet()));
               } else {
                 showModalBottomSheet(
-                  context: context, isScrollControlled: true, backgroundColor: Colors.transparent,
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
                   builder: (con) => const DeliveryInstructionBottomSheet(),
                 );
               }
             },
-            child: Row(children: [
-              Expanded(child: Text('add_more_delivery_instruction'.tr, style: robotoMedium, maxLines: 2, overflow: TextOverflow.ellipsis)),
-              const Icon(Icons.keyboard_arrow_down, size: 20),
-            ]),
+            borderRadius: BorderRadius.circular(Dimensions.radiusLarge),
+            child: Padding(
+              padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+              child: Row(
+                children: [
+                  // Action Icon
+                  Icon(Icons.assignment_outlined, color: orangePrimary, size: 20),
+                  const SizedBox(width: Dimensions.paddingSizeSmall),
+
+                  Expanded(
+                    child: Text(
+                      'add_more_delivery_instruction'.tr,
+                      style: robotoMedium.copyWith(color: Colors.black87),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+
+                  const Icon(Icons.add_circle_outline, color: orangePrimary, size: 22),
+                ],
+              ),
+            ),
           ),
 
-
+          // Active Selection View
           GetBuilder<CheckoutController>(
-            builder: (checkoutController) {
-              return checkoutController.selectedInstruction != -1 ? Row(children: [
-                Text(
-                  AppConstants.deliveryInstructionList[checkoutController.selectedInstruction].tr,
-                  style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).primaryColor),
-                ),
+              builder: (checkoutController) {
+                return checkoutController.selectedInstruction != -1 ? Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: Dimensions.paddingSizeDefault,
+                    vertical: Dimensions.paddingSizeSmall,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.withOpacity(0.05), // Subtle selection tint
+                    borderRadius: const BorderRadius.vertical(bottom: Radius.circular(Dimensions.radiusLarge)),
+                    border: Border(top: BorderSide(color: orangeBorder, width: 0.5)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.info_rounded, color: Colors.orange, size: 16),
+                      const SizedBox(width: Dimensions.paddingSizeSmall),
 
-                IconButton(
-                  onPressed: ()=> checkoutController.setInstruction(-1),
-                  icon: const Icon(Icons.clear, size: 18),
-                )
-              ]) : const SizedBox();
-            }
+                      Expanded(
+                        child: Text(
+                          AppConstants.deliveryInstructionList[checkoutController.selectedInstruction].tr,
+                          style: robotoMedium.copyWith(
+                            fontSize: Dimensions.fontSizeSmall,
+                            color: Colors.orange[800],
+                          ),
+                        ),
+                      ),
+
+                      GestureDetector(
+                        onTap: () => checkoutController.setInstruction(-1),
+                        child: Icon(Icons.remove_circle, size: 20, color: Colors.red.withOpacity(0.6)),
+                      ),
+                    ],
+                  ),
+                ) : const SizedBox();
+              }
           ),
         ],
       ),
     );
+  }
+}
 
     // return Container(
     //   decoration: BoxDecoration(
@@ -191,5 +247,5 @@ class _DeliveryInstructionViewState extends State<DeliveryInstructionView> {
     //     }
     //   ),
     // );
-  }
-}
+//   }
+// }

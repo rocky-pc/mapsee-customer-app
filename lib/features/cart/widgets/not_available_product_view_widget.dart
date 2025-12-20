@@ -13,43 +13,97 @@ class NotAvailableProductViewWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isDesktop = ResponsiveHelper.isDesktop(context);
+
+    // Consistent Theme Palette
+    const Color orangePrimary = Colors.orangeAccent;
+    final Color orangeShadow = Colors.orange.withOpacity(0.15); // Vibrant shadow
+    final Color orangeBorder = Colors.orange.withOpacity(0.2);
+
     return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-        border: Border.all(color: Theme.of(context).primaryColor.withValues(alpha: 0.5), width: 0.5),
+      margin: const EdgeInsets.symmetric(
+        horizontal: Dimensions.paddingSizeDefault,
+        vertical: Dimensions.paddingSizeSmall,
       ),
-      padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
-      margin: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeSmall),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor, // Reverted to CardColor for cleanliness
+        borderRadius: BorderRadius.circular(Dimensions.radiusLarge),
+        border: Border.all(color: orangeBorder, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: orangeShadow,
+            blurRadius: 15,
+            offset: const Offset(0, 8), // Matching the vibrant shadow from the CartScreen
+          ),
+        ],
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           InkWell(
-            onTap: (){
-              if(isDesktop){
+            onTap: () {
+              if (isDesktop) {
                 Get.dialog(const Dialog(child: NotAvailableBottomSheet()));
-              }else{
+              } else {
                 showModalBottomSheet(
-                  context: context, isScrollControlled: true, backgroundColor: Colors.transparent,
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
                   builder: (con) => const NotAvailableBottomSheet(),
                 );
               }
             },
-            child: Row(children: [
-              Expanded(child: Text('if_any_product_is_not_available'.tr, style: robotoMedium, maxLines: 2, overflow: TextOverflow.ellipsis)),
-              const Icon(Icons.keyboard_arrow_down, size: 20),
-            ]),
+            borderRadius: BorderRadius.circular(Dimensions.radiusLarge),
+            child: Padding(
+              padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline, color: orangePrimary, size: 20),
+                  const SizedBox(width: Dimensions.paddingSizeSmall),
+                  Expanded(
+                    child: Text(
+                      'if_any_product_is_not_available'.tr,
+                      style: robotoMedium.copyWith(color: Colors.black87),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const Icon(Icons.keyboard_arrow_down, color: orangePrimary, size: 22),
+                ],
+              ),
+            ),
           ),
 
-
-          cartController.notAvailableIndex != -1 ? Row(children: [
-            Text(cartController.notAvailableList[cartController.notAvailableIndex].tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).primaryColor)),
-
-            IconButton(
-              onPressed: ()=> cartController.setAvailableIndex(-1),
-              icon: const Icon(Icons.clear, size: 18),
-            )
-          ]) : const SizedBox(),
+          // Selection Indicator (Visible Result)
+          if (cartController.notAvailableIndex != -1)
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: Dimensions.paddingSizeDefault,
+                vertical: Dimensions.paddingSizeSmall,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(0.05), // Subtle tint for selection
+                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(Dimensions.radiusLarge)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.check_circle_rounded, color: Colors.green, size: 18),
+                  const SizedBox(width: Dimensions.paddingSizeSmall),
+                  Expanded(
+                    child: Text(
+                      cartController.notAvailableList[cartController.notAvailableIndex].tr,
+                      style: robotoMedium.copyWith(
+                        fontSize: Dimensions.fontSizeSmall,
+                        color: Colors.orange[800],
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () => cartController.setAvailableIndex(-1),
+                    child: Icon(Icons.cancel, size: 20, color: Colors.grey.withOpacity(0.6)),
+                  )
+                ],
+              ),
+            ),
         ],
       ),
     );
