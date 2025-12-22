@@ -51,8 +51,8 @@ class CheckoutScreen extends StatefulWidget {
 
 class CheckoutScreenState extends State<CheckoutScreen> {
   double? taxPercent = 0;
-  bool? _isCashOnDeliveryActive = false;
-  bool? _isDigitalPaymentActive = false;
+  bool _isCashOnDeliveryActive = false;
+  bool _isDigitalPaymentActive = false;
   bool _isOfflinePaymentActive = false;
   bool _isWalletActive = false;
   List<CartModel>? _cartList;
@@ -131,9 +131,9 @@ class CheckoutScreenState extends State<CheckoutScreen> {
       }
     }
 
-    checkoutController.setRestaurantDetails(restaurantId: _cartList![0].product!.restaurantId);
+    await checkoutController.setRestaurantDetails(restaurantId: _cartList![0].product!.restaurantId);
 
-    checkoutController.initCheckoutData(_cartList![0].product!.restaurantId);
+    await checkoutController.initCheckoutData(_cartList![0].product!.restaurantId);
 
 
     Get.find<CouponController>().setCoupon('', isUpdate: false);
@@ -141,12 +141,13 @@ class CheckoutScreenState extends State<CheckoutScreen> {
     checkoutController.stopLoader(isUpdate: false);
     checkoutController.updateTimeSlot(0, false, notify: false);
 
-    _isCashOnDeliveryActive = Get.find<SplashController>().configModel!.cashOnDelivery;
-    _isDigitalPaymentActive = Get.find<SplashController>().configModel!.digitalPayment;
-    _isOfflinePaymentActive = Get.find<SplashController>().configModel!.offlinePaymentStatus!;
-    _isWalletActive = Get.find<SplashController>().configModel!.customerWalletStatus!;
+    // Consider both global and restaurant-level cash on delivery flag
+    _isCashOnDeliveryActive = (Get.find<SplashController>().configModel!.cashOnDelivery ?? true) && (checkoutController.restaurant?.cashOnDelivery ?? true);
+    _isDigitalPaymentActive = Get.find<SplashController>().configModel!.digitalPayment ?? true;
+    _isOfflinePaymentActive = Get.find<SplashController>().configModel!.offlinePaymentStatus ?? false;
+    _isWalletActive = Get.find<SplashController>().configModel!.customerWalletStatus ?? false;
 
-    if(_isCashOnDeliveryActive ?? false){
+    if(_isCashOnDeliveryActive){
       checkoutController.setPaymentMethod(0, willUpdate: false);
     }
 
@@ -218,7 +219,7 @@ class CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   void setSinglePaymentActive() {
-    if(!_isCashOnDeliveryActive! && _isDigitalPaymentActive! && Get.find<SplashController>().configModel!.activePaymentMethodList!.length == 1 && !_isWalletActive) {
+    if(!_isCashOnDeliveryActive && _isDigitalPaymentActive && Get.find<SplashController>().configModel!.activePaymentMethodList!.length == 1 && !_isWalletActive) {
       Get.find<CheckoutController>().setPaymentMethod(2, willUpdate: false);
       Get.find<CheckoutController>().changeDigitalPaymentName(Get.find<SplashController>().configModel!.activePaymentMethodList![0].getWay!);
     }
@@ -413,7 +414,7 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                               charge: charge, deliveryCharge: deliveryCharge,
                               locationController: locationController, tomorrowClosed: tomorrowClosed, todayClosed: todayClosed,
                               price: price, discount: discount, addOns: addOnsPrice, restaurantSubscriptionActive: restaurantSubscriptionActive,
-                              showTips: showTips, isCashOnDeliveryActive: _isCashOnDeliveryActive!, isDigitalPaymentActive: _isDigitalPaymentActive!,
+                              showTips: showTips, isCashOnDeliveryActive: _isCashOnDeliveryActive, isDigitalPaymentActive: _isDigitalPaymentActive,
                               isWalletActive: _isWalletActive, fromCart: widget.fromCart, total: total, tooltipController3: tooltipController3, tooltipController2: tooltipController2,
                               guestNameTextEditingController: guestContactPersonNameController, guestNumberTextEditingController: guestContactPersonNumberController,
                               guestEmailController: guestEmailController, guestEmailNode: guestEmailNode,
@@ -427,7 +428,7 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                             Expanded(
                               flex: 4,
                               child: BottomSectionWidget(
-                                isCashOnDeliveryActive: _isCashOnDeliveryActive!, isDigitalPaymentActive: _isDigitalPaymentActive!, isWalletActive: _isWalletActive,
+                                isCashOnDeliveryActive: _isCashOnDeliveryActive, isDigitalPaymentActive: _isDigitalPaymentActive, isWalletActive: _isWalletActive,
                                 total: total, subTotal: subTotal, discount: discount, couponController: couponController,
                                 taxIncluded: (checkoutController.taxIncluded == 1), tax: checkoutController.orderTax!, deliveryCharge: deliveryCharge, checkoutController: checkoutController, locationController: locationController,
                                 todayClosed: todayClosed, tomorrowClosed: tomorrowClosed, orderAmount: orderAmount, maxCodOrderAmount: maxCodOrderAmount,
@@ -447,7 +448,7 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                             charge: charge, deliveryCharge: deliveryCharge,
                             locationController: locationController, tomorrowClosed: tomorrowClosed, todayClosed: todayClosed,
                             price: price, discount: discount, addOns: addOnsPrice, restaurantSubscriptionActive: restaurantSubscriptionActive,
-                            showTips: showTips, isCashOnDeliveryActive: _isCashOnDeliveryActive!, isDigitalPaymentActive: _isDigitalPaymentActive!,
+                            showTips: showTips, isCashOnDeliveryActive: _isCashOnDeliveryActive, isDigitalPaymentActive: _isDigitalPaymentActive,
                             isWalletActive: _isWalletActive, fromCart: widget.fromCart, total: total, tooltipController3: tooltipController3, tooltipController2: tooltipController2,
                             guestNameTextEditingController: guestContactPersonNameController, guestNumberTextEditingController: guestContactPersonNumberController,
                             guestEmailController: guestEmailController, guestEmailNode: guestEmailNode,
@@ -458,7 +459,7 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                           ),
 
                           BottomSectionWidget(
-                            isCashOnDeliveryActive: _isCashOnDeliveryActive!, isDigitalPaymentActive: _isDigitalPaymentActive!, isWalletActive: _isWalletActive,
+                            isCashOnDeliveryActive: _isCashOnDeliveryActive, isDigitalPaymentActive: _isDigitalPaymentActive, isWalletActive: _isWalletActive,
                             total: total, subTotal: subTotal, discount: discount, couponController: couponController,
                             taxIncluded: (checkoutController.taxIncluded == 1), tax: checkoutController.orderTax!, deliveryCharge: deliveryCharge, checkoutController: checkoutController, locationController: locationController,
                             todayClosed: todayClosed, tomorrowClosed: tomorrowClosed, orderAmount: orderAmount, maxCodOrderAmount: maxCodOrderAmount,
@@ -509,7 +510,7 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                         checkoutController: checkoutController, locationController: locationController,
                         todayClosed: todayClosed, tomorrowClosed: tomorrowClosed, orderAmount: orderAmount, deliveryCharge: deliveryCharge,
                         discount: discount, total: total, maxCodOrderAmount: maxCodOrderAmount, subscriptionQty: subscriptionQty,
-                        cartList: _cartList!, isCashOnDeliveryActive: _isCashOnDeliveryActive!, isDigitalPaymentActive: _isDigitalPaymentActive!,
+                        cartList: _cartList!, isCashOnDeliveryActive: _isCashOnDeliveryActive, isDigitalPaymentActive: _isDigitalPaymentActive,
                         isWalletActive: _isWalletActive, fromCart: widget.fromCart, guestNumberTextEditingController: guestContactPersonNumberController,
                         guestNumberNode: guestNumberNode, guestNameTextEditingController: guestContactPersonNameController,
                         guestEmailController: guestEmailController, guestEmailNode: guestEmailNode,
@@ -649,12 +650,12 @@ class CheckoutScreenState extends State<CheckoutScreen> {
     if(restaurant != null && cartList != null) {
       for (var cartModel in cartList) {
         double? dis = (restaurant.discount != null
-          && DateConverter.isAvailable(restaurant.discount!.startTime, restaurant.discount!.endTime))
-          ? restaurant.discount!.discount : cartModel.product!.discount;
+            && DateConverter.isAvailable(restaurant.discount!.startTime, restaurant.discount!.endTime))
+            ? restaurant.discount!.discount : cartModel.product!.discount;
 
         String? disType = (restaurant.discount != null
-          && DateConverter.isAvailable(restaurant.discount!.startTime, restaurant.discount!.endTime))
-          ? 'percent' : cartModel.product!.discountType;
+            && DateConverter.isAvailable(restaurant.discount!.startTime, restaurant.discount!.endTime))
+            ? 'percent' : cartModel.product!.discountType;
 
         double d = ((cartModel.product!.price! - PriceConverter.convertWithDiscount(cartModel.product!.price!, dis, disType)!) * cartModel.quantity!);
         discount = discount! + d;
@@ -680,12 +681,12 @@ class CheckoutScreenState extends State<CheckoutScreen> {
     if(restaurant != null && cartModel != null) {
 
       double? discount = (restaurant.discount != null
-        && DateConverter.isAvailable(restaurant.discount!.startTime, restaurant.discount!.endTime))
-         ? restaurant.discount!.discount : cartModel.product!.discount;
+          && DateConverter.isAvailable(restaurant.discount!.startTime, restaurant.discount!.endTime))
+          ? restaurant.discount!.discount : cartModel.product!.discount;
 
       String? discountType = (restaurant.discount != null
-        && DateConverter.isAvailable(restaurant.discount!.startTime, restaurant.discount!.endTime))
-        ? 'percent' : cartModel.product!.discountType;
+          && DateConverter.isAvailable(restaurant.discount!.startTime, restaurant.discount!.endTime))
+          ? 'percent' : cartModel.product!.discountType;
 
       for(int index = 0; index< cartModel.product!.variations!.length; index++) {
         for(int i=0; i<cartModel.product!.variations![index].variationValues!.length; i++) {

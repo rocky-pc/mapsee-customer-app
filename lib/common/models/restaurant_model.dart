@@ -98,6 +98,8 @@ class Restaurant {
   String? dineInBookingDurationTimeFormat;
   double? priceStartFrom;
 
+  bool? cashOnDelivery;
+
   Restaurant({
     this.id,
     this.name,
@@ -254,6 +256,7 @@ class Restaurant {
     dineInBookingDuration = json['schedule_advance_dine_in_booking_duration'] ?? 0;
     dineInBookingDurationTimeFormat = json['schedule_advance_dine_in_booking_duration_time_format'];
     priceStartFrom = json['price_starts_from']?.toDouble();
+    cashOnDelivery = json['cash_on_delivery'] ?? true;
   }
 
   Map<String, dynamic> toJson() {
@@ -326,6 +329,7 @@ class Restaurant {
     data['schedule_advance_dine_in_booking_duration'] = dineInBookingDuration;
     data['schedule_advance_dine_in_booking_duration_time_format'] = dineInBookingDurationTimeFormat;
     data['price_starts_from'] = priceStartFrom;
+    data['cash_on_delivery'] = cashOnDelivery;
     return data;
   }
 }

@@ -24,14 +24,14 @@ class LocationBannerViewWidget extends StatelessWidget {
     final double verticalPadding = isMobile ? Dimensions.paddingSizeSmall : Dimensions.paddingSizeLarge;
     // Removed containerHeight: height is now content-driven!
     final double innerPadding = isMobile ? Dimensions.paddingSizeSmall : Dimensions.paddingSizeLarge;
-    final double imageSize = isMobile ? 55 : 80; // Slightly smaller image
-    final double imageWidth = isMobile ? 68 : 100; // Slightly smaller image width
+    final double imageSize = isMobile ? 45 : 80; // Slightly smaller image
+    final double imageWidth = isMobile ? 58 : 100; // Slightly smaller image width
     final double titleFontSize = isMobile ? Dimensions.fontSizeDefault : Dimensions.fontSizeLarge; // More compact text
     final double subtitleFontSize = isMobile ? Dimensions.fontSizeSmall : Dimensions.fontSizeDefault; // More compact text
 
     // Button sizes
     final double buttonWidth = isMobile ? 90 : 120;
-    final double buttonHeight = isMobile ? 30 : 40;
+    final double buttonHeight = isMobile ? 25 : 40;
     final double iconSize = 25; // Icon size
     final double iconBackgroundSize = 40; // Icon background size
 
@@ -50,7 +50,7 @@ class LocationBannerViewWidget extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: verticalPadding),
       child: Container(
         // The main fix: Removed fixed height. Let the content dictate the height.
-        padding: EdgeInsets.all(isMobile ? Dimensions.paddingSizeSmall : Dimensions.paddingSizeLarge),
+        padding: EdgeInsets.all(isMobile ? Dimensions.paddingSizeExtraOverSmall : Dimensions.paddingSizeLarge),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: gradientColors,
@@ -122,7 +122,7 @@ class LocationBannerViewWidget extends StatelessWidget {
 
                 // --- Right Section: Icon and Button (The main structural fix) ---
                 Padding(
-                  padding: EdgeInsets.only(left: Dimensions.paddingSizeSmall, right: innerPadding),
+                  padding: EdgeInsets.only(left: Dimensions.paddingSizeSmall, right: innerPadding , top:Dimensions.paddingSizeSmall ),
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.center, // Center the group vertically
                       children: [

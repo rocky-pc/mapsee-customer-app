@@ -8,7 +8,7 @@ class AppConstants {
 
   static const String fontFamily = 'Poppins';
   static const bool payInWevView = false;
-  static const String webHostedUrl = 'https://stackfood-web.6amtech.com';
+  static const String webHostedUrl = 'https://web.mapsee.co.in';
   static const bool useReactWebsite = false;
   static const String googleServerClientId = '491987943015-agln6biv84krpnngdphj87jkko7r9lb8.apps.googleusercontent.com';
 

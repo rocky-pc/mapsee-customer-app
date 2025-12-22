@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/rendering.dart';
 import 'package:stackfood_multivendor/common/widgets/menu_drawer_widget.dart';
@@ -323,17 +324,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   const Icon(CupertinoIcons.search,
                       size: 20, color: Colors.grey),
                   const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+
+                  // UPDATED: Replaced static Text with RollingSearchText
                   Expanded(
-                      child: Text('Search for \'Sweets\''.tr,
-                          style: robotoRegular.copyWith(
-                              fontSize: Dimensions.fontSizeDefault,
-                              color: Theme.of(context).hintColor))),
+                    child: ClipRect( // Clips the animation so text doesn't bleed outside the bar
+                      child: const RollingSearchText(),
+                    ),
+                  ),
 
                   // ADDED: Separator Line
                   Container(
-                    height: 30, // Adjust height as needed
+                    height: 20, // Adjust height as needed
                     width: 1.3,
-                    color: Colors.grey.shade300,
+                    color: Colors.grey.shade400,
                     margin: const EdgeInsets.symmetric(
                         horizontal: Dimensions.paddingSizeExtraSmall),
                   ),
@@ -517,7 +520,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       bottom: 120, // (Optional) set this if you want to align from bottom
                                                     )
                                                         : const SizedBox.shrink();
-                                                  }),
+                                              }),
                                               // Content Layer (on top)
                                               const QuickOptionsViewWidget(),
                                             ],
@@ -555,6 +558,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         const BannerViewWidget()),
 
                                                 // 4. OTHER LIVE WIDGETS (What on your mind, trends, etc.)
+
+                                                  // Popular Restaurants
+                                                  if (_configModel?.popularRestaurant ==
+                                                      1)
+                                                    const PopularRestaurantsViewWidget(),
                                                 const WhatOnYourMindViewWidget(),
                                                 const TodayTrendsViewWidget(),
                                                 const LocationBannerViewWidget(),
@@ -570,12 +578,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     .dineInOrderOption!)
                                                   const DineInWidget(),
                                                 const CuisineViewWidget(),
-
-                                                // Popular Restaurants
-                                                if (_configModel
-                                                        .popularRestaurant ==
-                                                    1)
-                                                  const PopularRestaurantsViewWidget(),
 
                                                 // Discount Banner (Kept original logic)
                                                 GetBuilder<
@@ -716,8 +718,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                             '[ ${'minimum_purchase'.tr}: ${PriceConverter.convertPrice(discount.minPurchase)} ]  ',
                                                                             style:
                                                                                 robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).cardColor),
-                                                                          ),
-                                                                        if (discount.maxDiscount !=
+                                                                          ),                                                                        if (discount.maxDiscount !=
                                                                             0)
                                                                           Text(
                                                                             '[ ${'maximum_discount'.tr}: ${PriceConverter.convertPrice(discount.maxDiscount)} ]',
@@ -822,6 +823,95 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       });
     });
+  }
+}
+
+class RollingSearchText extends StatefulWidget {
+  const RollingSearchText({super.key});
+
+  @override
+  State<RollingSearchText> createState() => _RollingSearchTextState();
+}
+
+class _RollingSearchTextState extends State<RollingSearchText> {
+  int _index = 0;
+  late Timer _timer;
+
+  // Your 5 words/phrases
+  final List<String> _suggestions = [
+    'Sweets',
+    'Burgers',
+    'Pizza',
+    'Cakes',
+    'Gravy'
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Changes the word every 2 seconds
+    _timer = Timer.periodic(const Duration(seconds: 2), (timer) {
+      if (mounted) {
+        setState(() {
+          _index = (_index + 1) % _suggestions.length;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Text(
+          '${'Search for'.tr} ',
+          style: robotoRegular.copyWith(
+            fontSize: Dimensions.fontSizeDefault,
+            color: Theme.of(context).hintColor,
+          ),
+        ),
+        Expanded(
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 500), // Speed of the swipe
+            layoutBuilder: (currentChild, previousChildren) {
+              return Stack(
+                alignment: Alignment.centerLeft,
+                children: <Widget>[
+                  ...previousChildren,
+                  if (currentChild != null) currentChild,
+                ],
+              );
+            },
+            transitionBuilder: (Widget child, Animation<double> animation) {
+              // Creates the "swipe up" effect
+              return SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0.0, 1.0), // Starts from below
+                  end: const Offset(0.0, 0.0),   // Ends at center
+                ).animate(animation),
+                child: FadeTransition(opacity: animation, child: child),
+              );
+            },
+            child: Text(
+              '\'${_suggestions[_index]}\''.tr,
+              key: ValueKey(_suggestions[_index]), // Required for AnimatedSwitcher to trigger
+              style: robotoRegular.copyWith(
+                fontSize: Dimensions.fontSizeDefault,
+                color: Theme.of(context).hintColor,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
 

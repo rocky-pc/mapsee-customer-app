@@ -45,7 +45,7 @@ class RestaurantsViewWidget extends StatelessWidget {
                             : 4,
                     mainAxisSpacing: Dimensions.paddingSizeLarge,
                     crossAxisSpacing: Dimensions.paddingSizeLarge,
-                    mainAxisExtent: 235, // DECREASED FROM 250 TO 230
+                    mainAxisExtent: 252, // DECREASED FROM 250 TO 230
                   ),
                   padding: EdgeInsets.symmetric(
                       horizontal: !ResponsiveHelper.isDesktop(context)
@@ -113,382 +113,187 @@ class RestaurantView extends StatelessWidget {
     this.isSelected = false,
   });
 
-  Future<List<cm.CouponModel>?> _getCoupons(int restaurantId) async {
-    await Get.find<CouponController>()
-        .getRestaurantCouponList(restaurantId: restaurantId);
-    return Get.find<CouponController>().couponList;
-  }
-
   @override
   Widget build(BuildContext context) {
     bool isAvailable = restaurant.open == 1 && restaurant.active!;
+    bool isPureVeg = restaurant.veg == 1;
+    bool isNonVeg = restaurant.nonVeg == 1;
+
+    // --- RE-INTEGRATED CHARACTERISTICS LOGIC ---
     String characteristics = '';
-    // if (restaurant.characteristics != null) {
-    //   for (var v in restaurant.characteristics!) {
-    //     characteristics =
-    //     '$characteristics${characteristics.isNotEmpty ? ', ' : ''}$v';
-    //   }
-    // }
+    if (restaurant.characteristics != null) {
+      for (var v in restaurant.characteristics!) {
+        characteristics = '$characteristics${characteristics.isNotEmpty ? ', ' : ''}$v';
+      }
+    }
 
-    return FutureBuilder<List<cm.CouponModel>?>(
-      future: _getCoupons(restaurant.id!),
-      builder: (context, snapshot) {
-        List<cm.CouponModel>? couponList = snapshot.data;
-        cm.CouponModel? activeCoupon;
-        String discountText = '';
-        bool hasLiveCoupon = false;
-
-        String formatValue(num value) {
-          return value % 1 == 0 ? value.toInt().toString() : value.toString();
-        }
-
-        if (couponList != null && couponList.isNotEmpty) {
-          try {
-            activeCoupon = couponList.firstWhere((c) =>
-                c.startDate != null &&
-                c.expireDate != null &&
-                DateTime.now().isAfter(DateTime.parse(c.startDate!)) &&
-                DateTime.now().isBefore(DateTime.parse(c.expireDate!)));
-          } catch (_) {
-            activeCoupon = null;
-          }
-
-          if (activeCoupon != null) {
-            discountText = activeCoupon.discountType == 'Percent'
-                ? '${formatValue(activeCoupon.discount as num)}% ${'off'.tr}'
-                : '₹${formatValue(activeCoupon.discount as num)} ${'off'.tr}';
-            if (activeCoupon.maxDiscount != null &&
-                activeCoupon.maxDiscount! > 0) {
-              discountText =
-                  'Up to ₹${formatValue(activeCoupon.maxDiscount!)} ${'off'.tr}';
-            }
-          } else if (couponList.isNotEmpty) {
-            final first = couponList[0];
-            discountText = first.discountType == 'Percent'
-                ? '${formatValue(first.discount as num)}% ${'off'.tr}'
-                : '₹${formatValue(first.discount as num)} ${'off'.tr}';
-          }
-          hasLiveCoupon = true;
-        }
-
-        bool isPureVeg = restaurant.veg == 1;
-        bool isNonVeg = restaurant.nonVeg == 1;
-
-        return Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            border: isSelected
-                ? Border.all(color: Theme.of(context).primaryColor, width: 1)
-                : null,
-            borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.deepOrange.withOpacity(0.5),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-                spreadRadius: 1,
-              ),
-            ],
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(Dimensions.radiusLarge),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
           ),
-          child: CustomInkWellWidget(
-            onTap: onTap ??
-                () {
-                  if (restaurant.restaurantStatus == 1) {
-                    Get.toNamed(RouteHelper.getRestaurantRoute(restaurant.id),
-                        arguments: RestaurantScreen(restaurant: restaurant));
-                  } else if (restaurant.restaurantStatus == 0) {
-                    showCustomSnackBar('restaurant_is_not_available'.tr);
-                  }
-                },
-            radius: Dimensions.radiusDefault,
-            child: Stack(
-              clipBehavior: Clip.none,
+        ],
+      ),
+      child: CustomInkWellWidget(
+        onTap: onTap ?? () {
+          if (restaurant.restaurantStatus == 1) {
+            Get.toNamed(RouteHelper.getRestaurantRoute(restaurant.id),
+                arguments: RestaurantScreen(restaurant: restaurant));
+          } else {
+            showCustomSnackBar('restaurant_is_not_available'.tr);
+          }
+        },
+        radius: Dimensions.radiusLarge,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 1. Image Section
+            Stack(
               children: [
-                // 1. Cover Image
                 ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(Dimensions.radiusDefault),
-                    topRight: Radius.circular(Dimensions.radiusDefault),
-                  ),
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(Dimensions.radiusLarge)),
                   child: CustomImageWidget(
                     image: restaurant.coverPhotoFullUrl ?? '',
                     fit: BoxFit.cover,
-                    height: 179,
+                    height: 160,
                     width: double.infinity,
                     isRestaurant: true,
                   ),
                 ),
 
-                // 2. Unavailable Overlay - Only on Cover Image
-                if (!isAvailable)
+                // Delivery Time Badge (Reference Image Style)
+                if (restaurant.deliveryTime != null)
                   Positioned(
-                    top: 0,
-                    left: 0,
+                    bottom: 12,
                     right: 0,
-                    height: 179, // Same height as the cover image
-                    child: ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(Dimensions.radiusDefault),
-                        topRight: Radius.circular(Dimensions.radiusDefault),
-                      ),
-                      child: Container(
-                        color: Colors.black.withOpacity(0.6),
-                      ),
-                    ),
-                  ),
-
-                // 3. Closed Badge
-                if (!isAvailable)
-                  Positioned(
-                    top: 10,
-                    left: 10,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .error
-                            .withOpacity(0.9),
-                        borderRadius: BorderRadius.circular(20),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(topLeft: Radius.circular(8), bottomLeft: Radius.circular(8)),
                       ),
-                      child: Text(
-                        'closed_now'.tr,
-                        style: robotoMedium.copyWith(
-                            color: Colors.white,
-                            fontSize: Dimensions.fontSizeSmall),
-                      ),
-                    ),
-                  ),
-
-                // 4. Favourite Icon
-                Positioned(
-                  top: Dimensions.paddingSizeSmall,
-                  right: Dimensions.paddingSizeSmall,
-                  child: GetBuilder<FavouriteController>(
-                      builder: (favouriteController) {
-                    bool isWished = favouriteController.wishRestIdList
-                        .contains(restaurant.id);
-                    return CustomFavouriteWidget(
-                      isWished: isWished,
-                      isRestaurant: true,
-                      restaurant: restaurant,
-                    );
-                  }),
-                ),
-
-                // 5. Distance Badge (unchanged position)
-                Positioned(
-                  top: 159,
-                  right: 20,
-                  child: ClipPath(
-                    clipper: CurvedTopClipper(),
-                    child: Container(
-                      height: 25,
-                      color: Theme.of(context).cardColor,
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: Dimensions.paddingSizeDefault),
-                      child: Text(
-                        '${Get.find<RestaurantController>().getRestaurantDistance(
-                              LatLng(double.parse(restaurant.latitude!),
-                                  double.parse(restaurant.longitude!)),
-                            ).toStringAsFixed(2)} km',
-                        style: robotoMedium.copyWith(
-                            fontSize: Dimensions.fontSizeExtraSmall,
-                            color: Theme.of(context).primaryColor),
-                      ),
-                    ),
-                  ),
-                ),
-
-                // 6. Logo (Left - unchanged)
-                Positioned(
-                  top: 185,
-                  left: 16,
-                  child: Container(
-                    height: 40,
-                    width: 40,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius:
-                          BorderRadius.circular(Dimensions.radiusSmall),
-                      border: Border.all(
-                          color:
-                              Theme.of(context).disabledColor.withOpacity(0.3),
-                          width: 1.5),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.black.withOpacity(0.1), blurRadius: 4)
-                      ],
-                    ),
-                    child: ClipRRect(
-                      borderRadius:
-                          BorderRadius.circular(Dimensions.radiusSmall),
-                      child: CustomImageWidget(
-                        image: restaurant.logoFullUrl ?? '',
-                        fit: BoxFit.cover,
-                        height: 50,
-                        width: 50,
-                        isRestaurant: true,
-                      ),
-                    ),
-                  ),
-                ),
-
-                // 7. Main Info Area - Clean Two-Row Layout
-                Positioned(
-                  top: 182,
-                  left: 70,
-                  right: 16,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // === TOP ROW: Name + Veg/NonVeg Badges + Rating ===
-                      Row(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Expanded(
-                            child: Text(
-                              restaurant.name ?? '',
-                              style: robotoBold.copyWith(
-                                  fontSize: 15, color: Colors.black87),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                          Text(
+                            restaurant.deliveryTime!.toUpperCase(),
+                            style: robotoBold.copyWith(fontSize: 13, color: Colors.black87),
                           ),
-                          const SizedBox(width: 8),
-
-                          // Veg / Non-Veg Badges
-                          if (isPureVeg || isNonVeg) ...[
-                            if (isPureVeg)
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 6, vertical: 3),
-                                decoration: BoxDecoration(
-                                  color: Colors.green.withOpacity(0.1),
-                                  border:
-                                      Border.all(color: Colors.green, width: 1),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Text('Veg',
-                                    style: robotoMedium.copyWith(
-                                        color: Colors.green, fontSize: 10)),
-                              ),
-                            if (isPureVeg && isNonVeg) const SizedBox(width: 4),
-                            if (isNonVeg)
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 6, vertical: 3),
-                                decoration: BoxDecoration(
-                                  color: Colors.red.withOpacity(0.1),
-                                  border: Border.all(color: Colors.red, width: 1),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Text('Non-Veg',
-                                    style: robotoMedium.copyWith(
-                                        color: Colors.red, fontSize: 10)),
-                              ),
-                          ],
-
-                          if (restaurant.ratingCount! > 0) ...[
-                            const SizedBox(width: 8),
-                            Icon(Icons.star_rounded, size: 16, color: Colors.amber),
-                            const SizedBox(width: 4),
-                            Text(
-                              restaurant.avgRating!.toStringAsFixed(1),
-                              style: robotoMedium.copyWith(fontSize: 13),
-                            ),
-                          ],
+                          // Text(
+                          //   'FREE DELIVERY',
+                          //   style: robotoBold.copyWith(fontSize: 9, color: Colors.deepOrange),
+                          // ),
                         ],
                       ),
+                    ),
+                  ),
 
-                      const SizedBox(height: 4),
-
-                      // === BOTTOM ROW: Characteristics + Delivery Time + Coupon ===
-                      Row(
-                        children: [
-                          // Characteristics
-                          // if (characteristics.isNotEmpty)
-                          //   Expanded(
-                          //     flex: 3,
-                          //     child: Text(
-                          //       characteristics,
-                          //       style: robotoRegular.copyWith(
-                          //         fontSize: Dimensions.fontSizeSmall,
-                          //         color: Theme.of(context).hintColor,
-                          //       ),
-                          //       maxLines: 1,
-                          //       overflow: TextOverflow.ellipsis,
-                          //     ),
-                          //   ),
-
-                          // Delivery Time
-                          if (restaurant.deliveryTime != null)
-                            Row(
-                              children: [
-                                // if (characteristics.isNotEmpty) const SizedBox(width: 12),
-                                Icon(Icons.access_time_filled,
-                                    size: 14,
-                                    color: Theme.of(context).primaryColor),
-                                const SizedBox(width: 4),
-                                Text(
-                                  restaurant.deliveryTime!,
-                                  style: robotoMedium.copyWith(fontSize: 12),
-                                ),
-                              ],
-                            ),
-
-                          // Coupon Badge
-                          if (hasLiveCoupon) ...[
-                            const Spacer(),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: Colors.purple.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.local_offer,
-                                      size: 14, color: Colors.purple),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    discountText,
-                                    style: robotoBold.copyWith(
-                                        fontSize: 11, color: Colors.purple),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-
-                          // Free Delivery
-                          if (restaurant.freeDelivery!)
-                            Padding(
-                              padding: const EdgeInsets.only(left: 10),
-                              child: Row(
-                                children: [
-                                  Image.asset(Images.deliveryIcon,
-                                      height: 16, width: 16),
-                                  const SizedBox(width: 4),
-                                  Text('free'.tr,
-                                      style: robotoMedium.copyWith(
-                                          fontSize: 11, color: Colors.green)),
-                                ],
-                              ),
-                            ),
-                        ],
-                      ),
-                    ],
+                // Favorite
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: CustomFavouriteWidget(
+                    isWished: Get.find<FavouriteController>().wishRestIdList.contains(restaurant.id),
+                    isRestaurant: true,
+                    restaurant: restaurant,
                   ),
                 ),
               ],
             ),
-          ),
-        );
-      },
+
+            // 2. Info Section
+            Padding(
+              padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Restaurant Name
+                  Text(
+                    restaurant.name ?? '',
+                    style: robotoBold.copyWith(fontSize: 18, color: Colors.black87),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+
+                  const SizedBox(height: 4),
+
+                  // Rating, Location and Distance Row
+                  Row(
+                    children: [
+                      Icon(Icons.stars, color: Colors.green[700], size: 16),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${restaurant.avgRating?.toStringAsFixed(1)} (${restaurant.ratingCount})',
+                        style: robotoMedium.copyWith(fontSize: 13, color: Colors.black87),
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 4),
+                        child: Text('•', style: TextStyle(color: Colors.black54)),
+                      ),
+                      Expanded(
+                        child: Text(
+                          '${restaurant.address ?? 'White town'}, ${Get.find<RestaurantController>().getRestaurantDistance(
+                            LatLng(double.parse(restaurant.latitude!), double.parse(restaurant.longitude!)),
+                          ).toStringAsFixed(1)} km',
+                          style: robotoRegular.copyWith(fontSize: 13, color: Colors.black54),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 6),
+
+                  // Characteristics & Price for Two Row (DYNAMIC)
+                  Row(
+                    children: [
+                      // Veg/Non-Veg Badges
+                      if (isPureVeg) _buildVegBadge(true),
+                      if (isPureVeg && isNonVeg) const SizedBox(width: 4),
+                      if (isNonVeg) _buildVegBadge(false),
+
+                      const SizedBox(width: 8),
+
+                      // Combined Characteristics and Price
+                      Expanded(
+                        child: Text(
+                          '${characteristics.isNotEmpty ? characteristics : ''}${characteristics.isNotEmpty && restaurant.minimumOrder != null ? ', ' : ''} • Starts from ₹${restaurant.minimumOrder?.toInt()}',
+                          style: robotoRegular.copyWith(fontSize: 13, color: Colors.black54),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVegBadge(bool isVeg) {
+    return Container(
+      padding: const EdgeInsets.all(1.5),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: isVeg ? Colors.green : Colors.red, width: 1),
+        borderRadius: BorderRadius.circular(2),
+      ),
+      child: Icon(
+        Icons.circle,
+        size: 7,
+        color: isVeg ? Colors.green : Colors.red,
+      ),
     );
   }
 }

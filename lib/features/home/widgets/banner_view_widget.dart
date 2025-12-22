@@ -124,7 +124,7 @@ class BannerViewWidget extends StatelessWidget {
                 );
               }).toList(),
             ),
-            const SizedBox(height: Dimensions.paddingSizeDefault),
+            const SizedBox(height: Dimensions.paddingSizeExtraOverSmall),
           ],
         ),
       );

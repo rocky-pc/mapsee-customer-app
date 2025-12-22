@@ -42,7 +42,7 @@ class PopularRestaurantsViewWidget extends StatelessWidget {
       return Padding(
         padding: EdgeInsets.symmetric(
           vertical: ResponsiveHelper.isMobile(context)
-              ? Dimensions.paddingSizeSmall
+              ? Dimensions.paddingSizeExtraOverSmall
               : Dimensions.paddingSizeLarge,
         ),
         child: SizedBox(
