@@ -118,7 +118,7 @@ class RestaurantDescriptionViewWidget extends StatelessWidget {
             onTap: () => Get.toNamed(RouteHelper.getRestaurantReviewRoute(restaurant!.id, restaurant!.name, restaurant!)),
             child: Column(children: [
               Row(children: [
-                Icon(Icons.star, color: Theme.of(context).primaryColor, size: 20),
+                Icon(Icons.star_rounded, color: Theme.of(context).primaryColor, size: 20),
                 const SizedBox(width: Dimensions.paddingSizeExtraSmall),
                 Text(
                   restaurant!.avgRating!.toStringAsFixed(1),

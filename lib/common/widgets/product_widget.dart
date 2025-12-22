@@ -170,7 +170,7 @@ class ProductWidget extends StatelessWidget {
 
                       if(isRestaurant && restaurant!.ratingCount! > 0)
                         Row(children: [
-                          Icon(Icons.star, size: 16, color: Theme.of(context).textTheme.bodyLarge?.color),
+                          Icon(Icons.star_rounded, size: 16, color: Theme.of(context).textTheme.bodyLarge?.color),
                           const SizedBox(width: Dimensions.paddingSizeExtraSmall),
 
                           Text(isRestaurant ? restaurant!.avgRating!.toStringAsFixed(1) : product!.avgRating!.toStringAsFixed(1), style: robotoMedium),
@@ -184,7 +184,7 @@ class ProductWidget extends StatelessWidget {
 
                       if(!isRestaurant && product!.ratingCount! > 0)
                         Row(children: [
-                          Icon(Icons.star, size: 16, color: Theme.of(context).textTheme.bodyLarge?.color),
+                          Icon(Icons.star_rounded, size: 16, color: Theme.of(context).textTheme.bodyLarge?.color),
                           const SizedBox(width: Dimensions.paddingSizeExtraSmall),
 
                           Text(product!.avgRating!.toStringAsFixed(1), style: robotoMedium),

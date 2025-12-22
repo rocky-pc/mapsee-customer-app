@@ -87,7 +87,7 @@ class _MenuScreenState extends State<MenuScreen> {
                                 child: CustomImageWidget(
                                   placeholder: isLoggedIn ? Images.profilePlaceholder : Images.guestIcon,
                                   image: '${(profileController.userInfoModel != null && isLoggedIn) ? profileController.userInfoModel!.imageFullUrl : ''}',
-                                  height: 80, width: 90, fit: BoxFit.cover,
+                                  height: 80, width: 80, fit: BoxFit.cover,
                                 ),
                               ),
                             ],

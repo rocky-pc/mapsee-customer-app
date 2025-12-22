@@ -344,7 +344,7 @@ class _DineInRestaurantScreenState extends State<DineInRestaurantScreen> {
                       ),
                       child: Row(children: [
 
-                        Icon(Icons.star, color: Theme.of(context).primaryColor, size: 18),
+                        Icon(Icons.star_rounded, color: Theme.of(context).primaryColor, size: 18),
                         SizedBox(width: Dimensions.paddingSizeExtraSmall),
                         Text(restaurant.avgRating!.toStringAsFixed(1), style: robotoBold.copyWith(color: Theme.of(context).textTheme.bodyLarge!.color)),
 

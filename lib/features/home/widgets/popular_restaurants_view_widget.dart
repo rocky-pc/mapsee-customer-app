@@ -238,9 +238,9 @@ class PopularRestaurantsViewWidget extends StatelessWidget {
                                       Container(
                                         padding: const EdgeInsets.all(2),
                                         decoration: const BoxDecoration(color: Color(0xFF1B5E20), shape: BoxShape.circle),
-                                        child: const Icon(Icons.star, color: Colors.white, size: 8),
+                                        child: const Icon(Icons.star_rounded, color: Colors.white, size: 12),
                                       ),
-                                      const SizedBox(width: 4),
+                                      const SizedBox(width: 3),
                                       Text(
                                         restaurant.avgRating!.toStringAsFixed(1),
                                         style: robotoBold.copyWith(fontSize: Dimensions.fontSizeSmall),
@@ -253,7 +253,7 @@ class PopularRestaurantsViewWidget extends StatelessWidget {
                                       child: Text(
                                         '${restaurant.deliveryTime} • ${restController.getRestaurantDistance(LatLng(double.parse(restaurant.latitude!), double.parse(restaurant.longitude!))).toStringAsFixed(1)} km',
                                         style: robotoMedium.copyWith(
-                                          color: Theme.of(context).disabledColor,
+                                          color: Color(0xFF171717),
                                           fontSize: Dimensions.fontSizeExtraSmall,
                                         ),
                                         maxLines: 1,

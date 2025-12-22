@@ -168,7 +168,7 @@ class _BadWeatherWidgetState extends State<BadWeatherWidget> {
                     Flexible(
                       child: Text(
                         message,
-                        style: robotoMedium.copyWith(
+                        style: robotoBold.copyWith(
                           fontSize: Dimensions.fontSizeSmall,
                           color: Theme.of(context).cardColor,
                         ),

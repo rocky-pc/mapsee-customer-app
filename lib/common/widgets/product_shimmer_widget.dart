@@ -57,7 +57,7 @@ class ProductShimmer extends StatelessWidget {
                     const SizedBox(height: Dimensions.paddingSizeSmall),
 
                     Row(children: [
-                      Icon(Icons.star, size: 16, color: Theme.of(context).shadowColor),
+                      Icon(Icons.star_rounded, size: 16, color: Theme.of(context).shadowColor),
                       const SizedBox(width: Dimensions.paddingSizeExtraSmall),
 
                       Container(

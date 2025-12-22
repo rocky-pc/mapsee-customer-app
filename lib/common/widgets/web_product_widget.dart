@@ -178,7 +178,7 @@ class WebProductWidget extends StatelessWidget {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.star, color: Theme.of(context).primaryColor, size: 12),
+                                  Icon(Icons.star_rounded, color: Theme.of(context).primaryColor, size: 12),
                                   const SizedBox(width: Dimensions.paddingSizeExtraSmall),
                                   Text(
                                     product!.ratingCount.toString(),

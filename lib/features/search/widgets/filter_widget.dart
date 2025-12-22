@@ -300,7 +300,7 @@ class _FilterWidgetState extends State<FilterWidget> {
                 //               }
                 //             },
                 //             child: Icon(
-                //               (widget.isRestaurant ? searchController.restaurantRating < (index + 1) : searchController.rating < (index + 1)) ? Icons.star_border : Icons.star,
+                //               (widget.isRestaurant ? searchController.restaurantRating < (index + 1) : searchController.rating < (index + 1)) ? Icons.star_border : Icons.star_rounded,
                 //               size: 34,
                 //               color: (widget.isRestaurant ? searchController.restaurantRating < (index + 1) : searchController.rating < (index + 1)) ? Theme.of(context).disabledColor
                 //                   : Theme.of(context).primaryColor,

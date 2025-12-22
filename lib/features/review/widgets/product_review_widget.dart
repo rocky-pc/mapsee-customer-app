@@ -94,7 +94,7 @@ class _ProductReviewWidgetState extends State<ProductReviewWidget> {
                     itemBuilder: (context, i) {
                       return InkWell(
                         child: Icon(
-                          reviewController.ratingList[index] < (i + 1) ? Icons.star_border : Icons.star,
+                          reviewController.ratingList[index] < (i + 1) ? Icons.star_border : Icons.star_rounded,
                           size: 25,
                           color: reviewController.ratingList[index] < (i + 1) ? Theme.of(context).disabledColor
                               : Theme.of(context).primaryColor,

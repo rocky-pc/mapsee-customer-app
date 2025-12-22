@@ -100,7 +100,7 @@ class BestReviewedItemWidget1 extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
                               ),
                               child: Row(children: [
-                                Icon(Icons.star, color: Theme.of(context).primaryColor, size: 15),
+                                Icon(Icons.star_rounded, color: Theme.of(context).primaryColor, size: 15),
                                 const SizedBox(width: Dimensions.paddingSizeExtraSmall),
                                 Text(productList[index].avgRating!.toStringAsFixed(1), style: robotoRegular),
                               ]),
@@ -233,7 +233,7 @@ class BestReviewedItemShimmer extends StatelessWidget {
                         borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
                       ),
                       child: Row(children: [
-                        Icon(Icons.star, color: Theme.of(context).primaryColor, size: 15),
+                        Icon(Icons.star_rounded, color: Theme.of(context).primaryColor, size: 15),
                         const SizedBox(width: Dimensions.paddingSizeExtraSmall),
                         Text('0.0', style: robotoRegular),
                       ]),

@@ -247,7 +247,7 @@ class _CartScreenState extends State<CartScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(color: orange.withOpacity(0.1), borderRadius: BorderRadius.circular(Dimensions.radiusSmall)),
       child: Row(children: [
-        Icon(Icons.star, size: 14, color: orange),
+        Icon(Icons.star_rounded, size: 14, color: orange),
         const SizedBox(width: 4),
         Text(restaurantController.restaurant!.avgRating!.toStringAsFixed(1), style: robotoBold.copyWith(color: orange)),
       ]),

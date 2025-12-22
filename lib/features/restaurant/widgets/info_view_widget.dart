@@ -133,7 +133,7 @@ class InfoViewWidget extends StatelessWidget {
 
         Column(children: [
           Icon(Icons.access_time, color: Theme.of(context).primaryColor, size: 20 - (scrollingRate * (isDesktop ? 2 : 20))),
-          // const SizedBox(height: 2),
+          const SizedBox(height: 2),
 
           Text(restaurant.deliveryTime!, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall - (scrollingRate * (isDesktop ? 2 : Dimensions.fontSizeSmall)), color: Theme.of(context).textTheme.bodyLarge!.color)),
         ]),
@@ -160,7 +160,7 @@ class InfoViewWidget extends StatelessWidget {
           onTap: () => Get.toNamed(RouteHelper.getRestaurantReviewRoute(restaurant.id, restaurant.name, restaurant)),
           child: Column(children: [
             Row(children: [
-              Icon(Icons.star, color: Theme.of(context).primaryColor, size: 20 - (scrollingRate * (isDesktop ? 2 : 20))),
+              Icon(Icons.star_rounded, color: Theme.of(context).primaryColor, size: 20 - (scrollingRate * (isDesktop ? 2 : 20))),
               const SizedBox(width: Dimensions.paddingSizeExtraSmall),
               Text(
                 restaurant.avgRating!.toStringAsFixed(1),

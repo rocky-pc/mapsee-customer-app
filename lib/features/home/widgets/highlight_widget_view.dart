@@ -191,7 +191,7 @@ class HighlightRestaurantWidget extends StatelessWidget {
                       child: Row(
                         children: [
                           advertisement.isRatingActive == 1
-                              ? Icon(Icons.star, color: Theme.of(context).cardColor, size: 15)
+                              ? Icon(Icons.star_rounded, color: Theme.of(context).cardColor, size: 15)
                               : const SizedBox(),
                           SizedBox(width: advertisement.isRatingActive == 1 ? 5 : 0),
                           advertisement.isRatingActive == 1

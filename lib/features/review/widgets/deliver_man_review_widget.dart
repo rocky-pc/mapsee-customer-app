@@ -58,7 +58,7 @@ class _DeliveryManReviewWidgetState extends State<DeliveryManReviewWidget> {
                   itemBuilder: (context, i) {
                     return InkWell(
                       child: Icon(
-                        reviewController.deliveryManRating < (i + 1) ? Icons.star_border : Icons.star,
+                        reviewController.deliveryManRating < (i + 1) ? Icons.star_border : Icons.star_rounded,
                         size: 25,
                         color: reviewController.deliveryManRating < (i + 1) ? Theme.of(context).disabledColor
                             : Theme.of(context).primaryColor,

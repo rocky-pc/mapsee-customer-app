@@ -119,7 +119,7 @@ class RestaurantScreenShimmerWidget extends StatelessWidget {
             Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
 
               Column(children: [
-                Icon(Icons.star, color: Theme.of(context).shadowColor),
+                Icon(Icons.star_rounded, color: Theme.of(context).shadowColor),
                 const SizedBox(height: Dimensions.paddingSizeExtraSmall),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
@@ -347,7 +347,7 @@ class RestaurantScreenShimmerWidget extends StatelessWidget {
                         Row(children: [
 
                           Column(children: [
-                            Icon(Icons.star, color: Theme.of(context).shadowColor),
+                            Icon(Icons.star_rounded, color: Theme.of(context).shadowColor),
                             const SizedBox(height: Dimensions.paddingSizeExtraSmall),
                             ClipRRect(
                               borderRadius: BorderRadius.circular(Dimensions.radiusSmall),

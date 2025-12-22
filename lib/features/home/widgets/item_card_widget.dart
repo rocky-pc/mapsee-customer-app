@@ -269,7 +269,7 @@ class ItemCardWidget extends StatelessWidget {
                         children: [
                           Text(product.avgRating!.toStringAsFixed(1), style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall)),
                           const SizedBox(width: Dimensions.paddingSizeExtraSmall),
-                          Icon(Icons.star, color: Theme.of(context).primaryColor, size: 15),
+                          Icon(Icons.star_rounded, color: Theme.of(context).primaryColor, size: 15),
                           const SizedBox(width: Dimensions.paddingSizeExtraSmall),
                           Text('(${product.ratingCount})', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).hintColor)),
                         ],
