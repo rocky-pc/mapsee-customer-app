@@ -152,8 +152,8 @@ class _BadWeatherWidgetState extends State<BadWeatherWidget> {
                     if (iconUrl != null && iconUrl.isNotEmpty) ...[
                       Image.network(
                         iconUrl,
-                        height: 28,
-                        width: 28,
+                        height: 25,
+                        width: 25,
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) {
                           return Icon(
@@ -169,7 +169,7 @@ class _BadWeatherWidgetState extends State<BadWeatherWidget> {
                       child: Text(
                         message,
                         style: robotoBold.copyWith(
-                          fontSize: Dimensions.fontSizeSmall,
+                          fontSize: Dimensions.fontSizeExtraSmall,
                           color: Theme.of(context).cardColor,
                         ),
                         maxLines: 1,
