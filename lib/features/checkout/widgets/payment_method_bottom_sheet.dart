@@ -268,45 +268,45 @@ class _PaymentMethodBottomSheetState extends State<PaymentMethodBottomSheet> {
   Widget changeAmountView(CheckoutController checkoutController) {
     return Column(
       children: [
-        checkoutController.showChangeAmount ? Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).disabledColor.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-            border: Border.all(color: Theme.of(context).disabledColor.withValues(alpha: 0.2)),
-          ),
-          padding: EdgeInsets.all(Dimensions.paddingSizeSmall),
-          margin: EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, spacing: Dimensions.paddingSizeExtraSmall, children: [
+        // checkoutController.showChangeAmount ? Container(
+        //   decoration: BoxDecoration(
+        //     color: Theme.of(context).disabledColor.withValues(alpha: 0.1),
+        //     borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+        //     border: Border.all(color: Theme.of(context).disabledColor.withValues(alpha: 0.2)),
+        //   ),
+        //   padding: EdgeInsets.all(Dimensions.paddingSizeSmall),
+        //   margin: EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
+        //   // child: Column(crossAxisAlignment: CrossAxisAlignment.start, spacing: Dimensions.paddingSizeExtraSmall, children: [
+        //   //
+        //   //   Text('${'change_amount'.tr} (${Get.find<SplashController>().configModel?.currencySymbol})', style: robotoBold),
+        //   //
+        //   //   Text('add_cash_amount_for_charge'.tr, style: robotoRegular.copyWith(color: Theme.of(context).disabledColor)),
+        //   //   const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+        //   //
+        //   //   CustomTextFieldWidget(
+        //   //     hintText: 'amount'.tr,
+        //   //     showLabelText: false,
+        //   //     inputType: TextInputType.number,
+        //   //     isAmount: true,
+        //   //     inputAction: TextInputAction.done,
+        //   //     controller: _amountController,
+        //   //     isEnabled: checkoutController.paymentMethodIndex == 0 ? true : false,
+        //   //     onChanged: (String value){
+        //   //       checkoutController.setExchangeAmount(double.tryParse(value)??0);
+        //   //     },
+        //   //   ),
+        //   // ]),
+        // ) : const SizedBox(),
 
-            Text('${'change_amount'.tr} (${Get.find<SplashController>().configModel?.currencySymbol})', style: robotoBold),
-
-            Text('add_cash_amount_for_charge'.tr, style: robotoRegular.copyWith(color: Theme.of(context).disabledColor)),
-            const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-
-            CustomTextFieldWidget(
-              hintText: 'amount'.tr,
-              showLabelText: false,
-              inputType: TextInputType.number,
-              isAmount: true,
-              inputAction: TextInputAction.done,
-              controller: _amountController,
-              isEnabled: checkoutController.paymentMethodIndex == 0 ? true : false,
-              onChanged: (String value){
-                checkoutController.setExchangeAmount(double.tryParse(value)??0);
-              },
-            ),
-          ]),
-        ) : const SizedBox(),
-
-        CustomInkWellWidget(
-          onTap: (){
-            checkoutController.setShowChangeAmount(!checkoutController.showChangeAmount);
-          },
-          radius: Dimensions.radiusSmall,
-          padding: EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
-          child: Text(checkoutController.showChangeAmount ? 'see_less'.tr : 'see_more'.tr , style: robotoBold.copyWith(color: Colors.blue)),
-        ),
-        const SizedBox(height: Dimensions.paddingSizeSmall),
+        // CustomInkWellWidget(
+        //   onTap: (){
+        //     checkoutController.setShowChangeAmount(!checkoutController.showChangeAmount);
+        //   },
+        //   radius: Dimensions.radiusSmall,
+        //   padding: EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
+        //   child: Text(checkoutController.showChangeAmount ? 'see_less'.tr : 'see_more'.tr , style: robotoBold.copyWith(color: Colors.blue)),
+        // ),
+        // const SizedBox(height: Dimensions.paddingSizeSmall),
       ],
     );
   }
