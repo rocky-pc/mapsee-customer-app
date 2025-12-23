@@ -435,95 +435,97 @@ class _HomeScreenState extends State<HomeScreen> {
 
                                   // *** MODIFICATION START: EXTEND ORANGE BACKGROUND ***
 
-                                  // ORANGE BACKGROUND FOR QUICK OPTIONS (BadWeatherWidget removed from here)
+                                  // ORANGE BACKGROUND FOR QUICK OPTIONS
                                   SliverToBoxAdapter(
                                     child: Container(
-                                      // === START MODIFICATION FOR BORDER RADIUS ===
-                                      decoration: BoxDecoration(
-                                        color: Theme.of(context)
-                                            .primaryColor, // Set Orange Background
-                                        borderRadius: const BorderRadius.only(
-                                            bottomLeft: Radius.circular(
-                                                Dimensions.radiusLarge),
-                                            bottomRight: Radius.circular(
-                                                Dimensions.radiusLarge)),
-                                      ),
-                                      // === END MODIFICATION FOR BORDER RADIUS ===
-                                      child: Center(
-                                        child: SizedBox(
-                                          width: Dimensions.webMaxWidth,
-                                          child: Stack(
-                                            children: [
-                                              // Rain Animation Layer (behind content)
-                                              // GetBuilder<LocationController>(builder: (locationController) {
-                                              //   return (locationController.weatherIconUrl == 'https://mapsee.co.in/icons/rain.png' &&
-                                              //       locationController.isVideoInitialized)
-                                              //       ? SizedBox(
-                                              //     width: MediaQuery.of(context).size.width,
-                                              //     height: 150,
-                                              //     child: FittedBox(
-                                              //       fit: BoxFit.cover,
-                                              //       child: SizedBox(
-                                              //         width: locationController.videoController!.value.size.width,
-                                              //         height: locationController.videoController!.value.size.height,
-                                              //         child: VideoPlayer(locationController.videoController!),
-                                              //       ),
-                                              //     ),
-                                              //   )
-                                              //       : const SizedBox.shrink();
-                                              // }),
-                                              // Balloon Animation Layer (festive animation)
-                                              GetBuilder<LocationController>(
-                                                  builder:
-                                                      (locationController) {
-                                                return locationController
-                                                            .weatherIconUrl ==
-                                                        'https://mapsee.co.in/icons/festivel.png'
-                                                    ? BalloonAnimationWidget(
-                                                        width: MediaQuery.of(
-                                                                context)
-                                                            .size
-                                                            .width,
-                                                        height: 160,
-                                                        balloonDensity: 50,
-                                                        balloonSpeed: 200,
-                                                        minBalloonSize: 30,
-                                                        maxBalloonSize: 60,
+                                      color: Color(0xFFF4F4F4), // Backwards background color (White) to make rounded corners visible
+                                      child: Container(
+                                        height: 160,
+                                        width: Dimensions.webMaxWidth,
+                                        // === START MODIFICATION FOR BORDER RADIUS ===
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context).primaryColor, // Set Orange Background
+                                          borderRadius: const BorderRadius.only(
+                                              bottomLeft: Radius.circular(30), // Increased radius for better visibility
+                                              bottomRight: Radius.circular(30)),
+                                        ),
+                                        // === END MODIFICATION FOR BORDER RADIUS ===
+                                        child: Center(
+                                          child: SizedBox(
+                                            width: Dimensions.webMaxWidth,
+                                            child: Stack(
+                                              children: [
+                                                // Rain Animation Layer (behind content)
+                                                // GetBuilder<LocationController>(builder: (locationController) {
+                                                //   return (locationController.weatherIconUrl == 'https://mapsee.co.in/icons/rain.png' &&
+                                                //       locationController.isVideoInitialized)
+                                                //       ? SizedBox(
+                                                //     width: MediaQuery.of(context).size.width,
+                                                //     height: 150,
+                                                //     child: FittedBox(
+                                                //       fit: BoxFit.cover,
+                                                //       child: SizedBox(
+                                                //         width: locationController.videoController!.value.size.width,
+                                                //         height: locationController.videoController!.value.size.height,
+                                                //         child: VideoPlayer(locationController.videoController!),
+                                                //       ),
+                                                //     ),
+                                                //   )
+                                                //       : const SizedBox.shrink();
+                                                // }),
+                                                // Balloon Animation Layer (festive animation)
+                                                GetBuilder<LocationController>(
+                                                    builder:
+                                                        (locationController) {
+                                                  return locationController
+                                                              .weatherIconUrl ==
+                                                          'https://mapsee.co.in/icons/festivel.png'
+                                                      ? BalloonAnimationWidget(
+                                                          width: MediaQuery.of(
+                                                                  context)
+                                                              .size
+                                                              .width,
+                                                          height: 160,
+                                                          balloonDensity: 50,
+                                                          balloonSpeed: 200,
+                                                          minBalloonSize: 30,
+                                                          maxBalloonSize: 60,
+                                                        )
+                                                      : const SizedBox.shrink();
+                                                }),
+                                                // Heavy Traffic Animation Layer
+                                                GetBuilder<LocationController>(
+                                                    builder:
+                                                        (locationController) {
+                                                  return locationController
+                                                              .weatherIconUrl ==
+                                                          'https://mapsee.co.in/icons/traffic.png'
+                                                      ? HeavyTrafficAnimationWidget(
+                                                    width: 260, // Adjust width based on your header space
+                                                    // top: 5,    // Move it down from the top
+                                                    right: 10,  // Move it slightly away from the right edge
+                                                    bottom: 120, // (Optional) set this if you want to align from bottom
+                                                  )
+                                                      : const SizedBox.shrink();
+                                                }),
+                                                // Heavy Traffic Animation Layer
+                                                GetBuilder<LocationController>(
+                                                    builder:
+                                                        (locationController) {
+                                                      return locationController
+                                                          .weatherIconUrl ==
+                                                          'https://mapsee.co.in/icons/rush-hours.png'
+                                                          ? RushHoursAnimationWidget(
+                                                        width: 260, // Adjust width based on your header space
+                                                        right: 10,  // Move it slightly away from the right edge
+                                                        bottom: 120, // (Optional) set this if you want to align from bottom
                                                       )
-                                                    : const SizedBox.shrink();
-                                              }),
-                                              // Heavy Traffic Animation Layer
-                                              GetBuilder<LocationController>(
-                                                  builder:
-                                                      (locationController) {
-                                                return locationController
-                                                            .weatherIconUrl ==
-                                                        'https://mapsee.co.in/icons/traffic.png'
-                                                    ? HeavyTrafficAnimationWidget(
-                                                  width: 260, // Adjust width based on your header space
-                                                  // top: 5,    // Move it down from the top
-                                                  right: 10,  // Move it slightly away from the right edge
-                                                  bottom: 120, // (Optional) set this if you want to align from bottom
-                                                )
-                                                    : const SizedBox.shrink();
-                                              }),
-                                              // Heavy Traffic Animation Layer
-                                              GetBuilder<LocationController>(
-                                                  builder:
-                                                      (locationController) {
-                                                    return locationController
-                                                        .weatherIconUrl ==
-                                                        'https://mapsee.co.in/icons/rush-hours.png'
-                                                        ? RushHoursAnimationWidget(
-                                                      width: 260, // Adjust width based on your header space
-                                                      right: 10,  // Move it slightly away from the right edge
-                                                      bottom: 120, // (Optional) set this if you want to align from bottom
-                                                    )
-                                                        : const SizedBox.shrink();
-                                              }),
-                                              // Content Layer (on top)
-                                              const QuickOptionsViewWidget(),
-                                            ],
+                                                          : const SizedBox.shrink();
+                                                }),
+                                                // Content Layer (on top)
+                                                const QuickOptionsViewWidget(),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -550,10 +552,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                                                 // 3. LIVE BANNER VIEW WIDGET (Requested to be used)
                                                 Container(
-                                                    margin: const EdgeInsets
-                                                        .symmetric(
-                                                        vertical: Dimensions
-                                                            .paddingSizeSmall),
+                                                    margin: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
                                                     child:
                                                         const BannerViewWidget()),
 

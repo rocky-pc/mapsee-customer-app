@@ -171,19 +171,19 @@ class CouponViewWidget extends StatelessWidget {
 
               // Indicator Dots
               const SizedBox(height: 5),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: couponController.couponList!.map((bnr) {
-                  int index = couponController.couponList!.indexOf(bnr);
-                  return TabPageSelectorIndicator(
-                    backgroundColor: index == couponController.currentIndex
-                        ? orangeMain
-                        : orangeLight.withValues(alpha: 0.4),
-                    borderColor: Colors.transparent,
-                    size: index == couponController.currentIndex ? 7 : 5,
-                  );
-                }).toList(),
-              ),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.center,
+              //   children: couponController.couponList!.map((bnr) {
+              //     int index = couponController.couponList!.indexOf(bnr);
+              //     return TabPageSelectorIndicator(
+              //       backgroundColor: index == couponController.currentIndex
+              //           ? orangeMain
+              //           : orangeLight.withValues(alpha: 0.4),
+              //       borderColor: Colors.transparent,
+              //       size: index == couponController.currentIndex ? 7 : 5,
+              //     );
+              //   }).toList(),
+              // ),
             ],
           ),
         )

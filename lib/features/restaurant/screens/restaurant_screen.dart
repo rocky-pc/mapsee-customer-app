@@ -135,7 +135,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                   SliverPersistentHeader(
                     pinned: true,
                     delegate: SliverDelegate(
-                      height: 160,
+                      height: 115,
                       child: Container(
                         color: Theme.of(context).cardColor,
                         child: Column(children: [
@@ -230,7 +230,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                                 ),
                             ]),
                           ),
-                          const Divider(thickness: 0.2, height: 10),
+                          const Divider(thickness: 0.2, height: 5),
 
                           Expanded(
                             child: ListView.builder(
@@ -246,7 +246,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                                 // 1. "ALL" CATEGORY REDESIGN
                                 if (index == 0) {
                                   return Padding(
-                                    padding: const EdgeInsets.only(right: Dimensions.paddingSizeDefault),
+                                    padding: const EdgeInsets.only(right: Dimensions.paddingSizeDefault, bottom: 0),
                                     child: Column(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
@@ -294,8 +294,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                                   child: Padding(
                                     padding: const EdgeInsets.only(
                                       right: Dimensions.paddingSizeDefault,
-                                      top: 3,
-                                      bottom: 3,
+                                      bottom: 0,
                                     ),
                                     child: Column(
                                       mainAxisAlignment: MainAxisAlignment.center,
@@ -312,19 +311,19 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                                             borderRadius: BorderRadius.circular(100),
                                             child: CustomImageWidget(
                                               image: category.imageFullUrl ?? '',
-                                              height: 60,
-                                              width: 60,
+                                              height: 40,
+                                              width: 40,
                                               fit: BoxFit.cover,
                                             ),
                                           ),
                                         ),
-                                        const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+                                        // const SizedBox(height: Dimensions.paddingSizeExtraSmall),
                                         SizedBox(
                                           width: imageSize + 30,
                                           child: Text(
                                             category.name!,
                                             style: robotoMedium.copyWith(
-                                              fontSize: Dimensions.fontSizeSmall,
+                                              fontSize: Dimensions.fontSizeExtraSmall,
                                               color: isSelected
                                                   ? Theme.of(context).primaryColor
                                                   : Theme.of(context).textTheme.bodyLarge?.color,
@@ -346,47 +345,51 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                     ),
                   ),
 
-                // Product List (unchanged)
+                // Product List
                 SliverToBoxAdapter(
                   child: FooterViewWidget(
-                    child: Center(
-                      child: Container(
-                        width: Dimensions.webMaxWidth,
-                        child: PaginatedListViewWidget(
-                          scrollController: scrollController,
-                          onPaginate: (int? offset) {
-                            if (restController.isSearching) {
-                              restController.getRestaurantSearchProductList(
-                                restController.searchText,
-                                restController.restaurant!.id.toString(),
-                                offset!,
-                                restController.type,
-                              );
-                            } else {
-                              restController.getRestaurantProductList(
-                                  restController.restaurant!.id, offset!, restController.type, false);
-                            }
-                          },
-                          totalSize: restController.isSearching
-                              ? restController.restaurantSearchProductModel?.totalSize
-                              : restController.restaurantProducts != null
-                              ? restController.foodPageSize
+                    child: Container(
+                      width: Dimensions.webMaxWidth,
+                      child: PaginatedListViewWidget(
+                        scrollController: scrollController,
+                        onPaginate: (int? offset) {
+                          if (restController.isSearching) {
+                            restController.getRestaurantSearchProductList(
+                              restController.searchText,
+                              restController.restaurant!.id.toString(),
+                              offset!,
+                              restController.type,
+                            );
+                          } else {
+                            restController.getRestaurantProductList(
+                                restController.restaurant!.id, offset!, restController.type, false);
+                          }
+                        },
+                        totalSize: restController.isSearching
+                            ? restController.restaurantSearchProductModel?.totalSize
+                            : restController.restaurantProducts != null
+                            ? restController.foodPageSize
+                            : null,
+                        offset: restController.isSearching
+                            ? restController.restaurantSearchProductModel?.offset
+                            : restController.restaurantProducts != null
+                            ? restController.foodPageOffset
+                            : null,
+                        productView: ProductViewWidget(
+                          isRestaurant: false,
+                          restaurants: null,
+                          products: restController.isSearching
+                              ? restController.restaurantSearchProductModel?.products
+                              : restController.categoryList!.isNotEmpty
+                              ? restController.restaurantProducts
                               : null,
-                          offset: restController.isSearching
-                              ? restController.restaurantSearchProductModel?.offset
-                              : restController.restaurantProducts != null
-                              ? restController.foodPageOffset
-                              : null,
-                          productView: ProductViewWidget(
-                            isRestaurant: false,
-                            restaurants: null,
-                            products: restController.isSearching
-                                ? restController.restaurantSearchProductModel?.products
-                                : restController.categoryList!.isNotEmpty
-                                ? restController.restaurantProducts
-                                : null,
-                            inRestaurantPage: true,
-                            showDiscount: false,
+                          inRestaurantPage: true,
+                          showDiscount: false,
+                          padding: const EdgeInsets.only(
+                            left: Dimensions.paddingSizeDefault,
+                            right: Dimensions.paddingSizeDefault,
+                            top: 0,
+                            bottom: Dimensions.paddingSizeDefault,
                           ),
                         ),
                       ),

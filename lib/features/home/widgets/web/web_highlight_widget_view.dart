@@ -91,7 +91,7 @@ class _WebHighlightWidgetViewState extends State<WebHighlightWidgetView> {
                 },
               ),
 
-              const AdvertisementIndicator(),
+              // const AdvertisementIndicator(),
 
               const SizedBox(height: Dimensions.paddingSizeExtraSmall,),
 
