@@ -73,7 +73,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
   BoxDecoration _photoFrameDecoration(BuildContext context) {
     return BoxDecoration(
       color: Theme.of(context).cardColor,
-      borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+      borderRadius: BorderRadius.circular(100),
       boxShadow: [
         BoxShadow(
           color: Colors.deepOrange.withOpacity(0.5),
@@ -309,11 +309,11 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                                             borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
                                           ),
                                           child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(Dimensions.radiusSmall +3),
+                                            borderRadius: BorderRadius.circular(100),
                                             child: CustomImageWidget(
                                               image: category.imageFullUrl ?? '',
-                                              height: 70,
-                                              width: 70,
+                                              height: 60,
+                                              width: 60,
                                               fit: BoxFit.cover,
                                             ),
                                           ),
@@ -386,6 +386,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                                 ? restController.restaurantProducts
                                 : null,
                             inRestaurantPage: true,
+                            showDiscount: false,
                           ),
                         ),
                       ),

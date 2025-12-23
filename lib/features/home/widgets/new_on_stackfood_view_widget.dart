@@ -21,7 +21,7 @@ class NewOnStackFoodViewWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Define the color based on your specific instruction
-    final Color glassmorphismColor = Theme.of(context).secondaryHeaderColor;
+    final Color glassmorphismColor = Theme.of(context).primaryColor;
 
     return GetBuilder<RestaurantController>(builder: (restController) {
       return (restController.latestRestaurantList != null && restController.latestRestaurantList!.isEmpty) ? const SizedBox() : Padding(
@@ -38,7 +38,7 @@ class NewOnStackFoodViewWidget extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     // --- UPDATED COLOR HERE ---
-                    color: glassmorphismColor.withOpacity(0.7), // Using the themed orange color with transparency
+                    color: glassmorphismColor.withOpacity(0.9), // Using the themed orange color with transparency
                     // --------------------------
                     // borderRadius: BorderRadius.circular(Dimensions.radiusExtraLarge),
                     border: Border.all(

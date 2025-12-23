@@ -80,7 +80,7 @@ flutter:
 
   assets:
     - assets/image/
-    - assets/image/video.mp4
+#    - assets/image/video.mp4
     - assets/language/
     - assets/map/
     - assets/json/

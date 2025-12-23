@@ -455,23 +455,23 @@ class _HomeScreenState extends State<HomeScreen> {
                                           child: Stack(
                                             children: [
                                               // Rain Animation Layer (behind content)
-                                              GetBuilder<LocationController>(builder: (locationController) {
-                                                return (locationController.weatherIconUrl == 'https://mapsee.co.in/icons/rain.png' &&
-                                                    locationController.isVideoInitialized)
-                                                    ? SizedBox(
-                                                  width: MediaQuery.of(context).size.width,
-                                                  height: 150,
-                                                  child: FittedBox(
-                                                    fit: BoxFit.cover,
-                                                    child: SizedBox(
-                                                      width: locationController.videoController!.value.size.width,
-                                                      height: locationController.videoController!.value.size.height,
-                                                      child: VideoPlayer(locationController.videoController!),
-                                                    ),
-                                                  ),
-                                                )
-                                                    : const SizedBox.shrink();
-                                              }),
+                                              // GetBuilder<LocationController>(builder: (locationController) {
+                                              //   return (locationController.weatherIconUrl == 'https://mapsee.co.in/icons/rain.png' &&
+                                              //       locationController.isVideoInitialized)
+                                              //       ? SizedBox(
+                                              //     width: MediaQuery.of(context).size.width,
+                                              //     height: 150,
+                                              //     child: FittedBox(
+                                              //       fit: BoxFit.cover,
+                                              //       child: SizedBox(
+                                              //         width: locationController.videoController!.value.size.width,
+                                              //         height: locationController.videoController!.value.size.height,
+                                              //         child: VideoPlayer(locationController.videoController!),
+                                              //       ),
+                                              //     ),
+                                              //   )
+                                              //       : const SizedBox.shrink();
+                                              // }),
                                               // Balloon Animation Layer (festive animation)
                                               GetBuilder<LocationController>(
                                                   builder:

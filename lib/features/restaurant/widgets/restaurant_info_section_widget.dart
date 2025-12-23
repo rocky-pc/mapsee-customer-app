@@ -76,7 +76,7 @@ class RestaurantInfoSectionWidget extends StatelessWidget {
                           top: scrollingRate * (context.height * 0.035)
                         ),
                         child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall - (scrollingRate * Dimensions.paddingSizeSmall)),
+                          padding: EdgeInsets.symmetric(vertical: Dimensions.paddingSizeExtraSmall - (scrollingRate * Dimensions.paddingSizeExtraSmall)),
                           child: Column(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.center, children: [
 
                             InfoViewWidget(restaurant: restaurant, restController: restController, scrollingRate: scrollingRate),

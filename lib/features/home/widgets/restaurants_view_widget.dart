@@ -235,13 +235,13 @@ class RestaurantView extends StatelessWidget {
 
                     if (hasLiveCoupon)
                       Positioned(
-                        top: 10,
+                        top: 8,
                         left: 0,
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: const BoxDecoration(
                             color: Colors.blueAccent,
-                            borderRadius: BorderRadius.only(topRight: Radius.circular(5), bottomRight: Radius.circular(5)),
+                            borderRadius: BorderRadius.only(topLeft: Radius.circular(8),topRight: Radius.circular(5), bottomRight: Radius.circular(5)),
                           ),
                           child: Text(
                             discountText,

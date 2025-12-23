@@ -35,8 +35,9 @@ class ProductWidget extends StatelessWidget {
   final bool inRestaurant;
   final bool isCampaign;
   final bool fromCartSuggestion;
+  final bool showDiscount;
   const ProductWidget({super.key, required this.product, required this.isRestaurant, required this.restaurant, required this.index,
-    required this.length, this.inRestaurant = false, this.isCampaign = false, this.fromCartSuggestion = false});
+    required this.length, this.inRestaurant = false, this.isCampaign = false, this.fromCartSuggestion = false, this.showDiscount = true});
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +118,7 @@ class ProductWidget extends StatelessWidget {
                       ),
                     ),
 
-                    ((image != null && image.isNotEmpty) || isRestaurant) ? DiscountTagWidget(
+                    (((image != null && image.isNotEmpty) || isRestaurant) && showDiscount) ? DiscountTagWidget(
                       discount: discount, discountType: discountType,
                       freeDelivery: isRestaurant ? restaurant!.freeDelivery : false,
                       fromTop: Dimensions.paddingSizeExtraSmall, fromLeft: isAvailable ? -7 : -3, paddingVertical: ResponsiveHelper.isDesktop(context) ? 5 : 10,
@@ -226,7 +227,7 @@ class ProductWidget extends StatelessWidget {
                         ),
                         const SizedBox(width: Dimensions.paddingSizeExtraSmall),
 
-                        (image != null && image.isNotEmpty) ? const SizedBox.shrink() : DiscountTagWithoutImageWidget(discount: discount, discountType: discountType,
+                        ((image != null && image.isNotEmpty) || !showDiscount) ? const SizedBox.shrink() : DiscountTagWithoutImageWidget(discount: discount, discountType: discountType,
                             freeDelivery: isRestaurant ? restaurant!.freeDelivery : false),
 
                       ]),
