@@ -21,7 +21,7 @@ import 'package:stackfood_multivendor/features/home/widgets/best_review_item_vie
 import 'package:stackfood_multivendor/features/home/widgets/cuisine_view_widget.dart';
 import 'package:stackfood_multivendor/features/home/widgets/location_banner_view_widget.dart';
 import 'package:stackfood_multivendor/features/home/widgets/new_on_stackfood_view_widget.dart';
-import 'package:stackfood_multivendor/features/home/widgets/order_again_view_widget.dart';
+// import 'package:stackfood_multivendor/features/home/widgets/order_again_view_widget.dart';
 import 'package:stackfood_multivendor/features/home/widgets/popular_foods_nearby_view_widget.dart';
 import 'package:stackfood_multivendor/features/home/widgets/popular_restaurants_view_widget.dart';
 import 'package:stackfood_multivendor/features/home/widgets/refer_banner_view_widget.dart';
@@ -440,7 +440,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     child: Container(
                                       color: Color(0xFFF4F4F4), // Backwards background color (White) to make rounded corners visible
                                       child: Container(
-                                        height: 160,
+                                        height: 158,
                                         width: Dimensions.webMaxWidth,
                                         // === START MODIFICATION FOR BORDER RADIUS ===
                                         decoration: BoxDecoration(
@@ -456,23 +456,28 @@ class _HomeScreenState extends State<HomeScreen> {
                                             child: Stack(
                                               children: [
                                                 // Rain Animation Layer (behind content)
-                                                // GetBuilder<LocationController>(builder: (locationController) {
-                                                //   return (locationController.weatherIconUrl == 'https://mapsee.co.in/icons/rain.png' &&
-                                                //       locationController.isVideoInitialized)
-                                                //       ? SizedBox(
-                                                //     width: MediaQuery.of(context).size.width,
-                                                //     height: 150,
-                                                //     child: FittedBox(
-                                                //       fit: BoxFit.cover,
-                                                //       child: SizedBox(
-                                                //         width: locationController.videoController!.value.size.width,
-                                                //         height: locationController.videoController!.value.size.height,
-                                                //         child: VideoPlayer(locationController.videoController!),
-                                                //       ),
-                                                //     ),
-                                                //   )
-                                                //       : const SizedBox.shrink();
-                                                // }),
+                                                GetBuilder<LocationController>(builder: (locationController) {
+                                                  return (locationController.weatherIconUrl == 'https://mapsee.co.in/icons/rain.png' &&
+                                                      locationController.isVideoInitialized)
+                                                      ? ClipRRect(
+                                                    borderRadius: const BorderRadius.only(
+                                                        bottomLeft: Radius.circular(30),
+                                                        bottomRight: Radius.circular(30)),
+                                                    child: SizedBox(
+                                                      width: MediaQuery.of(context).size.width,
+                                                      height: 158,
+                                                      child: FittedBox(
+                                                        fit: BoxFit.cover,
+                                                        child: SizedBox(
+                                                          width: locationController.videoController!.value.size.width,
+                                                          height: locationController.videoController!.value.size.height,
+                                                          child: VideoPlayer(locationController.videoController!),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  )
+                                                      : const SizedBox.shrink();
+                                                }),
                                                 // Balloon Animation Layer (festive animation)
                                                 GetBuilder<LocationController>(
                                                     builder:
@@ -480,7 +485,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   return locationController
                                                               .weatherIconUrl ==
                                                           'https://mapsee.co.in/icons/festivel.png'
-                                                      ? BalloonAnimationWidget(
+                                                      ? ClipRRect(
+                                                      borderRadius: const BorderRadius.only(
+                                                          bottomLeft: Radius.circular(30),
+                                                          bottomRight: Radius.circular(30)),
+                                                      child: BalloonAnimationWidget(
                                                           width: MediaQuery.of(
                                                                   context)
                                                               .size
@@ -491,6 +500,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           minBalloonSize: 30,
                                                           maxBalloonSize: 60,
                                                         )
+                                                  )
                                                       : const SizedBox.shrink();
                                                 }),
                                                 // Heavy Traffic Animation Layer
@@ -566,8 +576,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 const TodayTrendsViewWidget(),
                                                 const LocationBannerViewWidget(),
                                                 const HighlightWidgetView(),
-                                                if (_isLogin)
-                                                  const OrderAgainViewWidget(),
+                                                // if (_isLogin)
+                                                //   const OrderAgainViewWidget(),
                                                 if (_configModel!
                                                         .mostReviewedFoods ==
                                                     1)

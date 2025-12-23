@@ -57,14 +57,13 @@ class DashboardScreenState extends State<DashboardScreen> {
           !ResponsiveHelper.isDesktop(Get.context)) {
         Future.delayed(
             const Duration(seconds: 1),
-            () => showAnimatedDialog(
+                () => showAnimatedDialog(
                 Get.context!, const CongratulationDialogue()));
       }
       Get.find<OrderController>().getRunningOrders(1, notify: false);
     }
 
     _pageIndex = widget.pageIndex;
-
     _pageController = PageController(initialPage: widget.pageIndex);
 
     _screens = [
@@ -85,7 +84,6 @@ class DashboardScreenState extends State<DashboardScreen> {
     return PopScope(
       canPop: Navigator.canPop(context),
       onPopInvokedWithResult: (didPop, result) async {
-        debugPrint('$_canExit');
         if (_pageIndex != 0) {
           _setPage(0);
         } else {
@@ -107,7 +105,6 @@ class DashboardScreenState extends State<DashboardScreen> {
             ));
           }
           _canExit = true;
-
           Timer(const Duration(seconds: 2), () {
             _canExit = false;
           });
@@ -115,57 +112,76 @@ class DashboardScreenState extends State<DashboardScreen> {
       },
       child: Scaffold(
         key: _scaffoldKey,
-        bottomNavigationBar: CustomBottomNavBar(
-            selectedIndex: _pageIndex, onItemTapped: _setPage),
-        body: GetBuilder<OrderController>(builder: (orderController) {
-          List<OrderModel> runningOrder =
+        resizeToAvoidBottomInset: false, // Prevents keyboard from pushing up the navbar
+
+        // 1. We removed 'bottomNavigationBar' from here entirely.
+
+        body: Stack(
+          children: [
+            // Layer 1: The Main Content (Dashboard/Orders/Etc)
+            GetBuilder<OrderController>(builder: (orderController) {
+              List<OrderModel> runningOrder =
               orderController.runningOrderList != null
                   ? orderController.runningOrderList!
                   : [];
 
-          List<OrderModel> reversOrder = List.from(runningOrder.reversed);
-          return ExpandableBottomSheet(
-            background: PageView(
-              controller: _pageController,
-              physics: const NeverScrollableScrollPhysics(),
-              children: _screens,
-            ),
-            persistentContentHeight: 100,
-            onIsContractedCallback: () {
-              if (!orderController.showOneOrder) {
-                orderController.showOrders();
-              }
-            },
-            onIsExtendedCallback: () {
-              if (orderController.showOneOrder) {
-                orderController.showOrders();
-              }
-            },
-            enableToggle: true,
-            expandableContent: (ResponsiveHelper.isDesktop(context) ||
+              List<OrderModel> reversOrder = List.from(runningOrder.reversed);
+
+              return ExpandableBottomSheet(
+                background: PageView(
+                  controller: _pageController,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: _screens,
+                ),
+                persistentContentHeight: 100,
+                onIsContractedCallback: () {
+                  if (!orderController.showOneOrder) {
+                    orderController.showOrders();
+                  }
+                },
+                onIsExtendedCallback: () {
+                  if (orderController.showOneOrder) {
+                    orderController.showOrders();
+                  }
+                },
+                enableToggle: true,
+                expandableContent: (ResponsiveHelper.isDesktop(context) ||
                     !_isLogin ||
                     orderController.runningOrderList == null ||
                     orderController.runningOrderList!.isEmpty ||
                     !orderController.showBottomSheet)
-                ? const SizedBox()
-                : Dismissible(
-                    key: UniqueKey(),
-                    onDismissed: (direction) {
-                      if (orderController.showBottomSheet) {
-                        orderController.showRunningOrders();
-                      }
-                    },
-                    child: RunningOrderViewWidget(
-                        reversOrder: reversOrder,
-                        onMoreClick: () {
-                          if (orderController.showBottomSheet) {
-                            orderController.showRunningOrders();
-                          }
-                          _setPage(3);
-                        }),
-                  ),
-          );
-        }),
+                    ? const SizedBox()
+                    : Dismissible(
+                  key: UniqueKey(),
+                  onDismissed: (direction) {
+                    if (orderController.showBottomSheet) {
+                      orderController.showRunningOrders();
+                    }
+                  },
+                  child: RunningOrderViewWidget(
+                      reversOrder: reversOrder,
+                      onMoreClick: () {
+                        if (orderController.showBottomSheet) {
+                          orderController.showRunningOrders();
+                        }
+                        _setPage(3);
+                      }),
+                ),
+              );
+            }),
+
+            // Layer 2: The Floating Navigation Bar (On Top)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0, // Stick to the bottom
+              child: CustomBottomNavBar(
+                  selectedIndex: _pageIndex,
+                  onItemTapped: _setPage
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

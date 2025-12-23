@@ -292,7 +292,7 @@ class RestaurantView extends StatelessWidget {
 
                       Row(
                         children: [
-                          Icon(Icons.stars, color: Colors.green[700], size: 16),
+                          Icon(Icons.stars_rounded, color: Colors.green[800], size: 16),
                           const SizedBox(width: 4),
                           Text(
                             '${restaurant.avgRating?.toStringAsFixed(1)} (${restaurant.ratingCount})',

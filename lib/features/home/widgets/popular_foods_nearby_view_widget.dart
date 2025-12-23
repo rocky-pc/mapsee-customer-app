@@ -137,7 +137,7 @@ class _PopularFoodNearbyViewWidgetState extends State<PopularFoodNearbyViewWidge
               ),
 
               // Extra bottom spacing for the whole section (optional but recommended)
-              SizedBox(height: Dimensions.paddingSizeLarge),
+              SizedBox(height: Dimensions.paddingSizeExtraOverSmall),
             ],
           ),
         ),
