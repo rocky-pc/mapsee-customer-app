@@ -30,6 +30,8 @@ import 'package:stackfood_multivendor/util/styles.dart';
 import 'package:stackfood_multivendor/common/widgets/product_view_widget.dart';
 import 'package:stackfood_multivendor/common/widgets/paginated_list_view_widget.dart';
 
+import '../../chat/screens/conversation_screen.dart';
+
 class Theme1HomeScreen extends StatelessWidget {
   final ScrollController scrollController;
   const Theme1HomeScreen({super.key, required this.scrollController});
