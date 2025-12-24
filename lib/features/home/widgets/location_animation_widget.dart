@@ -118,8 +118,8 @@ class _LocationAnimationWidgetState extends State<LocationAnimationWidget> with 
                 color: Theme.of(context).cardColor,
                 shadows: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
-                    blurRadius: 10,
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 8,
                     offset: const Offset(5, 5),
                   )
                 ],

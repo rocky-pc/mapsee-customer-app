@@ -14,34 +14,33 @@ class CustomBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Colors derived from theme
-    final Color lightOrange = Theme.of(context).secondaryHeaderColor;
-    final Color darkOrange = Theme.of(context).primaryColor;
+    final Color primaryColor = Theme.of(context).primaryColor;
 
     return GetBuilder<CartController>(builder: (cartController) {
       return Container(
-        // This margin creates the floating effect
-        margin: const EdgeInsets.fromLTRB(10, 0, 10, 12),
-        padding: const EdgeInsets.symmetric(vertical: 1),
+        // Margin for floating effect
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: lightOrange, // This is the Orange Pill color
+          color: primaryColor,
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
-              color: darkOrange.withOpacity(1),
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
               spreadRadius: 1,
-              blurRadius: 0.2,
             ),
           ],
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _buildNavItem(0, Icons.home_outlined, 'Home'),
-            _buildNavItem(1, Icons.favorite_outline, 'Wishlist'),
-            _buildCartNavItem(2, Icons.shopping_cart_outlined, 'My Cart', cartController.cartList.length),
-            _buildNavItem(3, Icons.receipt_outlined, 'Orders'),
-            _buildNavItem(4, Icons.menu, 'Menu'),
+            _buildNavItem(0, Icons.home_rounded, 'Home'),
+            _buildNavItem(1, Icons.favorite_rounded, 'Wishlist'),
+            _buildCartNavItem(2, Icons.shopping_cart_rounded, 'Cart', cartController.cartList.length),
+            _buildNavItem(3, Icons.receipt_long_rounded, 'Orders'),
+            _buildNavItem(4, Icons.menu_rounded, 'Menu'),
           ],
         ),
       );
@@ -52,28 +51,34 @@ class CustomBottomNavBar extends StatelessWidget {
     final bool isSelected = index == selectedIndex;
     return GestureDetector(
       onTap: () => onItemTapped(index),
-      child: Container(
-        color: Colors.transparent, // Capture taps
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(6, 6, 6, 2),
-              child: Icon(
+      behavior: HitTestBehavior.opaque,
+      child: SizedBox(
+        width: 70,
+        // FittedBox prevents the "RenderFlex Overflow" error by scaling content if needed
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
                 icon,
-                color: isSelected ? Colors.white : Colors.white.withOpacity(0.7),
-                size: 25,
+                color: isSelected ? Colors.white : Colors.white.withOpacity(0.6),
+                size: isSelected ? 28 : 26,
               ),
-            ),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? Colors.white : Colors.white.withOpacity(0.7),
-                fontSize: 12,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              const SizedBox(height: 2), // Reduced spacing to save space
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: isSelected ? Colors.white : Colors.white.withOpacity(0.6),
+                  fontSize: 10,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -83,59 +88,65 @@ class CustomBottomNavBar extends StatelessWidget {
     final bool isSelected = index == selectedIndex;
     return GestureDetector(
       onTap: () => onItemTapped(index),
-      child: Container(
-        color: Colors.transparent,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
-                  child: Icon(
+      behavior: HitTestBehavior.opaque,
+      child: SizedBox(
+        width: 60,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Icon(
                     icon,
-                    color: isSelected ? Colors.white : Colors.white.withOpacity(0.7),
-                    size: 28,
+                    color: isSelected ? Colors.white : Colors.white.withOpacity(0.6),
+                    size: isSelected ? 26 : 24,
                   ),
-                ),
-                if (cartCount > 0)
-                  Positioned(
-                    right: -5,
-                    top: -5,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 1.5),
-                      ),
-                      constraints: const BoxConstraints(
-                        minWidth: 20,
-                        minHeight: 20,
-                      ),
-                      child: Text(
-                        '$cartCount',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
+                  if (cartCount > 0)
+                    Positioned(
+                      right: -8,
+                      top: -5,
+                      child: Container(
+                        padding: const EdgeInsets.all(3),
+                        decoration: BoxDecoration(
+                          color: Colors.redAccent,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 1.5),
                         ),
-                        textAlign: TextAlign.center,
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Center(
+                          child: Text(
+                            '$cartCount',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-              ],
-            ),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? Colors.white : Colors.white.withOpacity(0.7),
-                fontSize: 12,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ],
               ),
-            ),
-          ],
+              const SizedBox(height: 2),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: isSelected ? Colors.white : Colors.white.withOpacity(0.6),
+                  fontSize: 10,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:stackfood_multivendor/features/cart/screens/cart_screen.dart';
 import 'package:stackfood_multivendor/features/checkout/widgets/congratulation_dialogue.dart';
-import 'package:stackfood_multivendor/features/dashboard/widgets/registration_success_bottom_sheet.dart';
 import 'package:stackfood_multivendor/features/home/screens/home_screen.dart';
 import 'package:stackfood_multivendor/features/menu/screens/menu_screen.dart';
 import 'package:stackfood_multivendor/features/order/controllers/order_controller.dart';
@@ -12,19 +11,17 @@ import 'package:stackfood_multivendor/features/splash/controllers/splash_control
 import 'package:stackfood_multivendor/features/order/domain/models/order_model.dart';
 import 'package:stackfood_multivendor/features/auth/controllers/auth_controller.dart';
 import 'package:stackfood_multivendor/features/dashboard/controllers/dashboard_controller.dart';
-import 'package:stackfood_multivendor/features/dashboard/widgets/address_bottom_sheet.dart';
 import 'package:stackfood_multivendor/features/dashboard/widgets/custom_bottom_nav_bar.dart';
 import 'package:stackfood_multivendor/features/dashboard/widgets/running_order_view_widget.dart';
 import 'package:stackfood_multivendor/features/favourite/screens/favourite_screen.dart';
 import 'package:stackfood_multivendor/features/loyalty/controllers/loyalty_controller.dart';
 import 'package:stackfood_multivendor/helper/responsive_helper.dart';
-import 'package:stackfood_multivendor/helper/route_helper.dart';
 import 'package:stackfood_multivendor/util/dimensions.dart';
-import 'package:stackfood_multivendor/common/widgets/cart_widget.dart';
-import 'package:stackfood_multivendor/common/widgets/custom_dialog_widget.dart';
 import 'package:expandable_bottom_sheet/expandable_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import '../../../common/widgets/custom_dialog_widget.dart';
 
 class DashboardScreen extends StatefulWidget {
   final int pageIndex;
@@ -43,7 +40,6 @@ class DashboardScreenState extends State<DashboardScreen> {
   final GlobalKey<ScaffoldMessengerState> _scaffoldKey = GlobalKey();
   bool _canExit = GetPlatform.isWeb ? true : false;
   late bool _isLogin;
-  bool active = false;
 
   @override
   void initState() {
@@ -113,7 +109,6 @@ class DashboardScreenState extends State<DashboardScreen> {
       child: Scaffold(
         key: _scaffoldKey,
         resizeToAvoidBottomInset: false, // Prevents keyboard from pushing up the navbar
-
         body: Column(
           children: [
             Expanded(
@@ -169,10 +164,19 @@ class DashboardScreenState extends State<DashboardScreen> {
               }),
             ),
 
-            CustomBottomNavBar(
-                selectedIndex: _pageIndex,
-                onItemTapped: _setPage
-            ),
+            GetBuilder<DashboardController>(builder: (dashboardController) {
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 500),
+                // Increased to 100 to ensure enough space for the floating bar + margins
+                height: dashboardController.showBottomNavBar
+                    ? (ResponsiveHelper.isDesktop(context) ? 0 : 70)
+                    : 0,
+                child: CustomBottomNavBar(
+                    selectedIndex: _pageIndex,
+                    onItemTapped: _setPage
+                ),
+              );
+            }),
           ],
         ),
       ),

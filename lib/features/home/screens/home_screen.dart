@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:stackfood_multivendor/common/widgets/menu_drawer_widget.dart';
+import 'package:stackfood_multivendor/features/dashboard/controllers/dashboard_controller.dart';
 import 'package:stackfood_multivendor/features/dine_in/controllers/dine_in_controller.dart';
 import 'package:stackfood_multivendor/features/home/controllers/advertisement_controller.dart';
 import 'package:stackfood_multivendor/features/home/widgets/cashback_dialog_widget.dart';
@@ -133,11 +134,17 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           Future.delayed(const Duration(milliseconds: 800),
                   () => Get.find<HomeController>().changeFavVisibility());
         }
-      } else {
+        if (Get.find<DashboardController>().showBottomNavBar) {
+          Get.find<DashboardController>().showHideBottomNavBar(false);
+        }
+      } else if (_scrollController.position.userScrollDirection == ScrollDirection.forward) {
         if (Get.find<HomeController>().showFavButton) {
           Get.find<HomeController>().changeFavVisibility();
           Future.delayed(const Duration(milliseconds: 800),
                   () => Get.find<HomeController>().changeFavVisibility());
+        }
+        if (!Get.find<DashboardController>().showBottomNavBar) {
+          Get.find<DashboardController>().showHideBottomNavBar(true);
         }
       }
     });

@@ -15,8 +15,16 @@ class DashboardController extends GetxController implements GetxService {
   bool _showLocationSuggestion = true;
   bool get showLocationSuggestion => _showLocationSuggestion;
 
+  bool _showBottomNavBar = true;
+  bool get showBottomNavBar => _showBottomNavBar;
+
   void hideSuggestedLocation(){
     _showLocationSuggestion = !_showLocationSuggestion;
+  }
+
+  void showHideBottomNavBar(bool show) {
+    _showBottomNavBar = show;
+    update();
   }
 
   Future<bool> checkLocationActive() async {

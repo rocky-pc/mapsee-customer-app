@@ -51,6 +51,16 @@ class SearchScreenState extends State<SearchScreen> {
     }
     Get.find<CuisineController>().getCuisineList();
     Get.find<search.SearchController>().getHistoryList();
+
+    if (Get.arguments == 'voice') {
+      Future.delayed(const Duration(milliseconds: 300), () {
+        VoicePermissionHandler.openVoiceSearch(
+          context: context,
+          searchTextEditingController: _searchTextEditingController,
+          isDesktop: ResponsiveHelper.isDesktop(context),
+        );
+      });
+    }
   }
 
   Future<void> _searchSuggestions(String query) async {

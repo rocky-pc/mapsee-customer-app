@@ -125,7 +125,6 @@ class SwiggySearchBarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isDesktop = ResponsiveHelper.isDesktop(context);
     return Container(
       width: Dimensions.webMaxWidth,
       color: Theme.of(context).primaryColor,
@@ -174,12 +173,8 @@ class SwiggySearchBarWidget extends StatelessWidget {
                   IconButton(
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
-                    onPressed: () async {
-                      await VoicePermissionHandler.openVoiceSearch(
-                        context: context,
-                        searchTextEditingController: searchTextEditingController,
-                        isDesktop: isDesktop,
-                      );
+                    onPressed: () {
+                      Get.toNamed(RouteHelper.getSearchRoute(), arguments: 'voice');
                     },
                     icon: Icon(
                       Icons.mic_rounded,
