@@ -201,7 +201,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               endDrawer: const MenuDrawerWidget(),
               endDrawerEnableOpenDragGesture: false,
               // MODIFIED: Changed Scaffold background to the specific Primary Color
-              backgroundColor: const Color(0xFFFD6723),
+              backgroundColor: const Color(0xFFFD531F),
 
               body: Stack(
                 children: [

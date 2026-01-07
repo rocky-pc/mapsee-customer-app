@@ -21,7 +21,7 @@ class SwiggyHeaderWidget extends StatelessWidget {
     return Container(
       width: Dimensions.webMaxWidth,
       decoration: BoxDecoration(
-        color: Theme.of(context).primaryColor,
+        color: Color(0xFFFD531F),
         borderRadius: const BorderRadius.only(
           // bottomLeft: Radius.circular(Dimensions.radiusExtraLarge),
           // bottomRight: Radius.circular(Dimensions.radiusExtraLarge),
@@ -130,7 +130,7 @@ class SwiggyHeaderWidget extends StatelessWidget {
                           shape: BoxShape.circle,
                         ),
                         child: Icon(Icons.person_sharp,
-                            size: 25, color: Theme.of(context).primaryColor),
+                            size: 25, color: Color(0xFFFD531F)),
                       ),
                     ),
                   ],
@@ -152,7 +152,7 @@ class SwiggySearchBarWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: Dimensions.webMaxWidth,
-      color: Theme.of(context).primaryColor,
+      color: Color(0xFFFD531F),
       padding: const EdgeInsets.symmetric(
           horizontal: Dimensions.paddingSizeSmall, vertical: 8),
       child: Row(
@@ -203,7 +203,7 @@ class SwiggySearchBarWidget extends StatelessWidget {
                     icon: Icon(
                       Icons.mic_rounded,
                       size: 26,
-                      color: Theme.of(context).primaryColor,
+                      color: Color(0xFFFD531F),
                     ),
                   ),
                 ]),
