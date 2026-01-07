@@ -1,3 +1,5 @@
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:stackfood_multivendor/common/models/restaurant_model.dart';
 import 'package:stackfood_multivendor/features/restaurant/controllers/restaurant_controller.dart';
 import 'package:stackfood_multivendor/util/app_constants.dart';
 import 'package:stackfood_multivendor/util/dimensions.dart';
@@ -42,6 +44,35 @@ class _AllRestaurantScreenState extends State<AllRestaurantScreen> {
 
     return GetBuilder<RestaurantController>(
       builder: (restController) {
+
+        List<Restaurant>? restaurantList;
+        if(widget.isPopular) {
+          restaurantList = restController.popularRestaurantList;
+        } else if(widget.isRecentlyViewed){
+          restaurantList = restController.recentlyViewedRestaurantList;
+        } else if(widget.isOrderAgain) {
+          restaurantList = restController.orderAgainRestaurantList;
+        } else {
+          restaurantList = restController.latestRestaurantList;
+        }
+
+        if (restaurantList != null) {
+          restaurantList = restaurantList.where((restaurant) {
+            if(restaurant.latitude != null && restaurant.longitude != null) {
+              try {
+                double distance = restController.getRestaurantDistance(LatLng(
+                  double.parse(restaurant.latitude!),
+                  double.parse(restaurant.longitude!),
+                ));
+                return distance <= 12;
+              } catch (e) {
+                return false;
+              }
+            }
+            return false;
+          }).toList();
+        }
+
         return Scaffold(
           appBar: CustomAppBarWidget(
             title: widget.isPopular ? 'popular_restaurants'.tr : widget.isRecentlyViewed
@@ -84,9 +115,7 @@ class _AllRestaurantScreenState extends State<AllRestaurantScreen> {
                     width: Dimensions.webMaxWidth,
                     child: ProductViewWidget(
                       isRestaurant: true, products: null, noDataText: 'no_restaurant_available'.tr,
-                      restaurants: widget.isPopular ? restController.popularRestaurantList : widget.isRecentlyViewed
-                          ? restController.recentlyViewedRestaurantList : widget.isOrderAgain
-                          ? restController.orderAgainRestaurantList : restController.latestRestaurantList,
+                      restaurants: restaurantList,
                       padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
                     ),
                   )),

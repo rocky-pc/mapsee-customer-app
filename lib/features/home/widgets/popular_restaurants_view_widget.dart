@@ -1,6 +1,7 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:stackfood_multivendor/common/widgets/custom_favourite_widget.dart';
 import 'package:stackfood_multivendor/common/widgets/custom_ink_well_widget.dart';
+import 'package:stackfood_multivendor/common/widgets/custom_snackbar_widget.dart';
 import 'package:stackfood_multivendor/features/home/widgets/arrow_icon_button_widget.dart';
 import 'package:stackfood_multivendor/features/language/controllers/localization_controller.dart';
 import 'package:stackfood_multivendor/features/restaurant/controllers/restaurant_controller.dart';
@@ -10,6 +11,7 @@ import 'package:stackfood_multivendor/features/coupon/controllers/coupon_control
 import 'package:stackfood_multivendor/features/coupon/domain/models/coupon_model.dart' as cm;
 import 'package:stackfood_multivendor/helper/responsive_helper.dart';
 import 'package:stackfood_multivendor/helper/route_helper.dart';
+import 'package:stackfood_multivendor/util/app_constants.dart';
 import 'package:stackfood_multivendor/util/dimensions.dart';
 import 'package:stackfood_multivendor/util/styles.dart';
 import 'package:stackfood_multivendor/common/widgets/custom_image_widget.dart';
@@ -35,6 +37,16 @@ class PopularRestaurantsViewWidget extends StatelessWidget {
           ? restController.recentlyViewedRestaurantList
           : restController.popularRestaurantList;
 
+      if (restaurantList != null) {
+        restaurantList = restaurantList.where((restaurant) {
+          double distance = restController.getRestaurantDistance(LatLng(
+            double.parse(restaurant.latitude!),
+            double.parse(restaurant.longitude!),
+          ));
+          return distance <= AppConstants.restaurantActiveDistance;
+        }).toList();
+      }
+
       if (restaurantList != null && restaurantList.isEmpty) {
         return const SizedBox();
       }
@@ -54,7 +66,7 @@ class PopularRestaurantsViewWidget extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.symmetric(
                     horizontal: ResponsiveHelper.isDesktop(context) ? 0 : Dimensions.paddingSizeDefault,
-                    vertical: Dimensions.paddingSizeLarge),
+                    vertical: Dimensions.paddingSizeExtraSmall),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -81,7 +93,8 @@ class PopularRestaurantsViewWidget extends StatelessWidget {
                   physics: const BouncingScrollPhysics(),
                   itemCount: restaurantList.length,
                   itemBuilder: (context, index) {
-                    final restaurant = restaurantList[index];
+                    final restaurant = restaurantList![index];
+                    double distance = restController.getRestaurantDistance(LatLng(double.parse(restaurant.latitude!), double.parse(restaurant.longitude!)));
                     bool isAvailable = restaurant.open == 1 && restaurant.active!;
 
                     // --- Characteristics Logic ---
@@ -146,10 +159,12 @@ class PopularRestaurantsViewWidget extends StatelessWidget {
                               children: [
                                 // 1. Image Stack
                                 CustomInkWellWidget(
-                                  onTap: () => Get.toNamed(
-                                    RouteHelper.getRestaurantRoute(restaurant.id),
-                                    arguments: RestaurantScreen(restaurant: restaurant),
-                                  ),
+                                  onTap: () {
+                                    Get.toNamed(
+                                      RouteHelper.getRestaurantRoute(restaurant.id),
+                                      arguments: RestaurantScreen(restaurant: restaurant),
+                                    );
+                                  },
                                   radius: Dimensions.radiusDefault,
                                   child: Stack(
                                     children: [
@@ -208,7 +223,11 @@ class PopularRestaurantsViewWidget extends StatelessWidget {
                                               borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
                                             ),
                                             child: Center(
-                                              child: Text('closed_now'.tr, style: robotoBold.copyWith(color: Colors.white)),
+                                              child: Text(
+                                                'closed_now'.tr,
+                                                textAlign: TextAlign.center,
+                                                style: robotoBold.copyWith(color: Colors.white),
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -251,7 +270,7 @@ class PopularRestaurantsViewWidget extends StatelessWidget {
                                     ],
                                     Expanded(
                                       child: Text(
-                                        '${restaurant.deliveryTime} • ${restController.getRestaurantDistance(LatLng(double.parse(restaurant.latitude!), double.parse(restaurant.longitude!))).toStringAsFixed(1)} km',
+                                        '${restaurant.deliveryTime} • ${distance.toStringAsFixed(1)} km',
                                         style: robotoMedium.copyWith(
                                           color: Color(0xFF171717),
                                           fontSize: Dimensions.fontSizeExtraSmall,
@@ -294,8 +313,7 @@ class PopularRestaurantsViewWidget extends StatelessWidget {
   }
 
   Future<List<cm.CouponModel>?> getCoupons(int restaurantId) async {
-    await Get.find<CouponController>().getRestaurantCouponList(restaurantId: restaurantId);
-    return Get.find<CouponController>().couponList;
+    return await Get.find<CouponController>().getRestaurantCouponList(restaurantId: restaurantId, setActive: false);
   }
 }
 

@@ -4,15 +4,17 @@ import 'package:get/get.dart';
 
 class AppConstants {
   static const String appName = 'MapSee';
-  static const double appVersion = 8.5; ///Flutter SDK: 3.35.7
+  static const double appVersion = 8.6; ///Flutter SDK: 3.35.7
 
   static const String fontFamily = 'Poppins';
   static const bool payInWevView = false;
   static const String webHostedUrl = 'https://web.mapsee.co.in';
   static const bool useReactWebsite = false;
   static const String googleServerClientId = '491987943015-agln6biv84krpnngdphj87jkko7r9lb8.apps.googleusercontent.com';
+  static const int restaurantActiveDistance = 12;
 
   static const String baseUrl = 'https://mapsee.co.in';
+  // static const String baseUrl = 'http://192.168.1.14:8000';
   static const String categoryUri = '/api/v1/categories';
   static const String bannerUri = '/api/v1/banners';
   static const String restaurantProductUri = '/api/v1/products/latest';

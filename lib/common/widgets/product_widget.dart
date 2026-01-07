@@ -36,8 +36,10 @@ class ProductWidget extends StatelessWidget {
   final bool isCampaign;
   final bool fromCartSuggestion;
   final bool showDiscount;
+  final double? imageHeight;
+  final double? imageWidth;
   const ProductWidget({super.key, required this.product, required this.isRestaurant, required this.restaurant, required this.index,
-    required this.length, this.inRestaurant = false, this.isCampaign = false, this.fromCartSuggestion = false, this.showDiscount = true});
+    required this.length, this.inRestaurant = false, this.isCampaign = false, this.fromCartSuggestion = false, this.showDiscount = true, this.imageHeight, this.imageWidth});
 
   @override
   Widget build(BuildContext context) {
@@ -107,11 +109,13 @@ class ProductWidget extends StatelessWidget {
                       borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
                       child: CustomImageWidget(
                         image: '${isRestaurant ? restaurant!.logoFullUrl : product!.imageFullUrl}',
-                        height: desktop ? 120 : length == null ? 100 : isRestaurant ? 120 : 100, width: desktop ? 120 : isRestaurant ? 110 : 90, fit: BoxFit.cover,
+                        height: imageHeight ?? (desktop ? 120 : length == null ? 100 : isRestaurant ? 120 : 100),
+                        width: imageWidth ?? (desktop ? 120 : isRestaurant ? 110 : 90), fit: BoxFit.cover,
                         isFood: !isRestaurant, isRestaurant: isRestaurant,
                       ),
                     ) : isAvailable ? const SizedBox() : Container(
-                      height: desktop ? 120 : length == null ? 100 : isRestaurant ? 120 : 100, width: desktop ? 120 : isRestaurant ? 110 : 90,
+                      height: imageHeight ?? (desktop ? 120 : length == null ? 100 : isRestaurant ? 120 : 100),
+                      width: imageWidth ?? (desktop ? 120 : isRestaurant ? 110 : 90),
                       decoration: BoxDecoration(
                         color: Get.isDarkMode ? Theme.of(context).disabledColor : null,
                         borderRadius: BorderRadius.circular(Dimensions.radiusDefault),

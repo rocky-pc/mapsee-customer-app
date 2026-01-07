@@ -27,6 +27,8 @@ class AdvertisementModel {
   List<Storage>? storage;
   double? averageRating;
   int? reviewsCommentsCount;
+  String? restaurantLatitude;
+  String? restaurantLongitude;
 
   AdvertisementModel({
     this.id,
@@ -57,6 +59,8 @@ class AdvertisementModel {
     this.storage,
     this.averageRating,
     this.reviewsCommentsCount,
+    this.restaurantLatitude,
+    this.restaurantLongitude,
   });
 
   AdvertisementModel.fromJson(Map<String, dynamic> json) {
@@ -93,6 +97,8 @@ class AdvertisementModel {
     }
     averageRating = json['average_rating']?.toDouble();
     reviewsCommentsCount = json['reviews_comments_count'];
+    restaurantLatitude = json['restaurant_latitude'];
+    restaurantLongitude = json['restaurant_longitude'];
   }
 
   Map<String, dynamic> toJson() {
@@ -127,6 +133,8 @@ class AdvertisementModel {
     }
     data['average_rating'] = averageRating;
     data['reviews_comments_count'] = reviewsCommentsCount;
+    data['restaurant_latitude'] = restaurantLatitude;
+    data['restaurant_longitude'] = restaurantLongitude;
     return data;
   }
 }

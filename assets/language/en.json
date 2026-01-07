@@ -1,5 +1,5 @@
 {
-  "your_business_name": "StackFood",
+  "your_business_name": "MapSee",
   "connection_to_api_server_failed": "Connection to API server failed due to internet connection",
   "select_language": "Select Language",
   "save": "Save",
@@ -14,6 +14,8 @@
   "next": "Next",
   "get_started": "Get Started",
   "sign_in": "Sign In",
+    "opens_at": "Opens at",
+  "closes_at": "Closes at",
   "sign_up": "Sign Up",
   "email": "E-mail",
   "password": "Password",

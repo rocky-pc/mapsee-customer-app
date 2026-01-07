@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -59,6 +58,7 @@ import 'package:stackfood_multivendor/helper/price_converter.dart';
 import 'package:stackfood_multivendor/helper/date_converter.dart';
 import 'package:stackfood_multivendor/common/widgets/footer_view_widget.dart';
 import 'package:stackfood_multivendor/common/widgets/web_menu_bar.dart';
+import 'package:video_player/video_player.dart';
 import '../widgets/enjoy_off_banner_view_widget.dart';
 import '../widgets/location_animation_widget.dart';
 
@@ -200,7 +200,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               ResponsiveHelper.isDesktop(context) ? const WebMenuBar() : null,
               endDrawer: const MenuDrawerWidget(),
               endDrawerEnableOpenDragGesture: false,
-              backgroundColor: Theme.of(context).primaryColor,
+              // MODIFIED: Changed Scaffold background to the specific Primary Color
+              backgroundColor: const Color(0xFFFD6723),
 
               body: Stack(
                 children: [
@@ -238,11 +239,20 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                   child: Container(
                                     color: const Color(0xFFF4F4F4),
                                     child: Container(
-                                      height: 158,
+                                      height: 180,
                                       width: Dimensions.webMaxWidth,
-                                      decoration: BoxDecoration(
-                                        color: Theme.of(context).primaryColor,
-                                        borderRadius: const BorderRadius.only(
+                                      // MODIFIED: Added the 3-color fresh empathetic gradient here
+                                      decoration: const BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Color(0xFFFD531F), // Main Primary
+                                            Color(0xFFFF8847), // Fresh Secondary
+                                            Color(0xFFFFB680), // Empathetic Light
+                                          ],
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                        ),
+                                        borderRadius: BorderRadius.only(
                                             bottomLeft: Radius.circular(30),
                                             bottomRight: Radius.circular(30)),
                                       ),
@@ -262,7 +272,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                                             bottomRight: Radius.circular(30)),
                                                         child: BalloonAnimationWidget(
                                                           width: MediaQuery.of(context).size.width,
-                                                          height: 160,
+                                                          height: 180,
                                                           balloonDensity: 50,
                                                           balloonSpeed: 200,
                                                           minBalloonSize: 30,
@@ -279,7 +289,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                                         ? const HeavyTrafficAnimationWidget(
                                                       width: 260,
                                                       right: 10,
-                                                      bottom: 120,
+                                                      bottom: 137,
                                                     )
                                                         : const SizedBox.shrink();
                                                   }),
@@ -291,10 +301,34 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                                         ? const RushHoursAnimationWidget(
                                                       width: 260,
                                                       right: 10,
-                                                      bottom: 120,
+                                                      bottom: 137,
                                                     )
                                                         : const SizedBox.shrink();
                                                   }),
+
+                                              GetBuilder<LocationController>(
+                                                  builder: (locationController) {
+                                                    return locationController.weatherIconUrl == 'https://mapsee.co.in/icons/rain.png' &&
+                                                        locationController.videoController != null &&
+                                                        locationController.videoController!.value.isInitialized
+                                                        ? Positioned.fill(
+                                                      child: ClipRRect(
+                                                        borderRadius: const BorderRadius.only(
+                                                            bottomLeft: Radius.circular(30),
+                                                            bottomRight: Radius.circular(30)),
+                                                        child: FittedBox(
+                                                          fit: BoxFit.cover,
+                                                          child: SizedBox(
+                                                            width: locationController.videoController!.value.size.width,
+                                                            height: locationController.videoController!.value.size.height,
+                                                            child: VideoPlayer(locationController.videoController!),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    )
+                                                        : const SizedBox.shrink();
+                                                  }),
+
                                               const QuickOptionsViewWidget(),
                                             ],
                                           ),
@@ -369,7 +403,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                                           ),
                                                           padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
                                                           decoration: BoxDecoration(
-                                                            color: Theme.of(context).primaryColor,
+                                                            // MODIFIED: Use the specific primary color here as well
+                                                            color: const Color(0xFFFD6723),
                                                             borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
                                                           ),
                                                           child: Column(

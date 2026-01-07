@@ -1,7 +1,10 @@
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:stackfood_multivendor/common/models/restaurant_model.dart';
 import 'package:stackfood_multivendor/features/home/widgets/filter_view_widget.dart';
 import 'package:stackfood_multivendor/features/home/widgets/restaurant_filter_button_widget.dart';
 import 'package:stackfood_multivendor/features/restaurant/controllers/restaurant_controller.dart';
 import 'package:stackfood_multivendor/helper/responsive_helper.dart';
+import 'package:stackfood_multivendor/util/app_constants.dart';
 import 'package:stackfood_multivendor/util/dimensions.dart';
 import 'package:stackfood_multivendor/util/styles.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +18,26 @@ class AllRestaurantFilterWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetBuilder<RestaurantController>(
       builder: (restaurantController) {
+        List<Restaurant>? restaurantList = restaurantController.restaurantModel?.restaurants;
+
+        if (restaurantList != null) {
+          final restController = Get.find<RestaurantController>();
+          restaurantList = restaurantList.where((restaurant) {
+            if(restaurant.latitude != null && restaurant.longitude != null) {
+              try {
+                double distance = restController.getRestaurantDistance(LatLng(
+                  double.parse(restaurant.latitude!),
+                  double.parse(restaurant.longitude!),
+                ));
+                return distance <= AppConstants.restaurantActiveDistance;
+              } catch (e) {
+                return false;
+              }
+            }
+            return false;
+          }).toList();
+        }
+
         return Center(
           child: ResponsiveHelper.isDesktop(context) ? Container(
               height: 70,
@@ -28,7 +51,7 @@ class AllRestaurantFilterWidget extends StatelessWidget {
                     Text('all_restaurants'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge, fontWeight: FontWeight.w600)),
 
                     Text(
-                      '${restaurantController.restaurantModel != null ? restaurantController.restaurantModel!.totalSize : 0} ${'restaurants_near_you'.tr}',
+                      '${restaurantList != null ? restaurantList.length : 0} ${'restaurants_near_you'.tr}',
                       style: robotoBold.copyWith(color:deepBlack, fontSize: Dimensions.fontSizeSmall),
                     ),
                   ]),
@@ -52,7 +75,7 @@ class AllRestaurantFilterWidget extends StatelessWidget {
                 Flexible(
                   child: RichText(
                     text: TextSpan(
-                      text: '${restaurantController.restaurantModel != null ? restaurantController.restaurantModel!.totalSize : 0} ',
+                      text: '${restaurantList != null ? restaurantList.length : 0} ',
                       style: robotoRegular.copyWith(color: deepBlack, fontSize: Dimensions.fontSizeSmall, fontWeight: FontWeight.w500),
                       children: [
                         TextSpan(text: 'restaurants_near_you'.tr, style: robotoRegular.copyWith(color: deepBlack, fontSize: Dimensions.fontSizeSmall, fontWeight: FontWeight.w500)),
@@ -67,7 +90,7 @@ class AllRestaurantFilterWidget extends StatelessWidget {
               filter(context, restaurantController),
               const SizedBox(height: Dimensions.paddingSizeExtraSmall),
 
-              Divider(),
+              const Divider(),
             ]),
           ),
         );

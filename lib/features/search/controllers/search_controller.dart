@@ -1,11 +1,14 @@
 import 'dart:async';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:stackfood_multivendor/common/models/product_model.dart';
 import 'package:stackfood_multivendor/common/models/restaurant_model.dart';
+import 'package:stackfood_multivendor/features/restaurant/controllers/restaurant_controller.dart';
 import 'package:stackfood_multivendor/features/search/domain/models/search_suggestion_model.dart';
 import 'package:stackfood_multivendor/features/search/domain/services/search_service_interface.dart';
 import 'package:get/get.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:flutter/material.dart';
+import 'package:stackfood_multivendor/util/app_constants.dart';
 
 class SearchController extends GetxController implements GetxService {
   final SearchServiceInterface searchServiceInterface;
@@ -313,17 +316,80 @@ class SearchController extends GetxController implements GetxService {
               _searchRestList = [];
               _allRestList = [];
             }
-            _searchRestList!.addAll(RestaurantModel.fromJson(response.body).restaurants!);
-            _allRestList!.addAll(RestaurantModel.fromJson(response.body).restaurants!);
-            totalSize = RestaurantModel.fromJson(response.body).totalSize;
+            RestaurantModel restaurantModel = RestaurantModel.fromJson(response.body);
+            List<Restaurant> restaurantList = [];
+            final restController = Get.find<RestaurantController>();
+
+            for(var restaurant in restaurantModel.restaurants!) {
+              if(restaurant.latitude != null && restaurant.longitude != null) {
+                try {
+                  double distance = restController.getRestaurantDistance(LatLng(
+                    double.parse(restaurant.latitude!),
+                    double.parse(restaurant.longitude!),
+                  ));
+                  if(distance <= AppConstants.restaurantActiveDistance) {
+                    restaurantList.add(restaurant);
+                  }
+                } catch (e) {
+                  //ignore
+                }
+              }
+            }
+
+            _searchRestList!.addAll(restaurantList);
+            _allRestList!.addAll(restaurantList);
+            totalSize = _searchRestList!.length;
             pageOffset = RestaurantModel.fromJson(response.body).offset;
           } else {
             if(offset == 1) {
               _searchProductList = [];
             }
-            _searchProductList!.addAll(ProductModel.fromJson(response.body).products!);
-            totalSize = ProductModel.fromJson(response.body).totalSize;
-            pageOffset = ProductModel.fromJson(response.body).offset;
+
+            ProductModel productModel = ProductModel.fromJson(response.body);
+            List<Product> productList = [];
+            final restController = Get.find<RestaurantController>();
+
+            for (var product in productModel.products!) {
+              bool isWithinDistance = false;
+              if (product.restaurantLatitude != null && product.restaurantLongitude != null) {
+                try {
+                  double distance = restController.getRestaurantDistance(LatLng(
+                    double.parse(product.restaurantLatitude!),
+                    double.parse(product.restaurantLongitude!),
+                  ));
+                  if (distance <= AppConstants.restaurantActiveDistance) {
+                    isWithinDistance = true;
+                  }
+                } catch (e) {
+                  // Ignore if parsing fails
+                }
+              } else {
+                if (restController.restaurantModel != null && restController.restaurantModel!.restaurants != null) {
+                  final restaurant = restController.restaurantModel!.restaurants!.firstWhere((r) => r.id == product.restaurantId, orElse: () => Restaurant());
+                  if (restaurant.latitude != null && restaurant.longitude != null) {
+                    try {
+                      double distance = restController.getRestaurantDistance(LatLng(
+                        double.parse(restaurant.latitude!),
+                        double.parse(restaurant.longitude!),
+                      ));
+                      if (distance <= AppConstants.restaurantActiveDistance) {
+                        isWithinDistance = true;
+                      }
+                    } catch (e) {
+                      // Ignore if parsing fails
+                    }
+                  }
+                }
+              }
+
+              if (isWithinDistance) {
+                productList.add(product);
+              }
+            }
+
+            _searchProductList!.addAll(productList);
+            totalSize = _searchProductList!.length;
+            pageOffset = ProductModel.fromJson(response.body).offset; // This might need adjustment if pagination is affected
             if(_lowerValue == 0 || _upperValue == 0) {
               _lowerValue = ProductModel.fromJson(response.body).minPrice ?? 0;
               _upperValue = ProductModel.fromJson(response.body).maxPrice ?? 0;

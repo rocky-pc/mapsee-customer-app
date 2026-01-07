@@ -17,8 +17,7 @@ import 'package:marquee/marquee.dart';
 class RestaurantInfoSectionWidget extends StatelessWidget {
   final Restaurant restaurant;
   final RestaurantController restController;
-  final bool hasCoupon;
-  const RestaurantInfoSectionWidget({super.key, required this.restaurant, required this.restController, required this.hasCoupon});
+  const RestaurantInfoSectionWidget({super.key, required this.restaurant, required this.restController});
 
   @override
   Widget build(BuildContext context) {
@@ -26,26 +25,27 @@ class RestaurantInfoSectionWidget extends StatelessWidget {
     final double xyz = MediaQuery.of(context).size.width-1170;
     final double realSpaceNeeded = xyz/2;
 
-    return SliverAppBar(
-      expandedHeight: isDesktop ? 350 : hasCoupon ? 400 : 300,
-      toolbarHeight: isDesktop ? 150 : 90,
-      pinned: true, floating: false, elevation: 0.5,
-      backgroundColor: Theme.of(context).cardColor,
-      leading: !isDesktop ? IconButton(
-        icon: Container(
-          height: 50, width: 50,
-          decoration: BoxDecoration(shape: BoxShape.circle, color: Theme.of(context).primaryColor),
-          alignment: Alignment.center,
-          padding: const EdgeInsets.only(right: Dimensions.paddingSizeExtraSmall),
-          child: Icon(Icons.chevron_left, color: Theme.of(context).cardColor, size: 28),
-        ),
-        onPressed: () => Get.back(),
-      ) : const SizedBox(),
+    return GetBuilder<CouponController>(
+      builder: (couponController) {
+        bool hasCoupons = couponController.couponList != null && couponController.couponList!.isNotEmpty;
 
-      flexibleSpace: GetBuilder<CouponController>(
-        builder: (couponController) {
-          bool hasCoupons = couponController.couponList != null && couponController.couponList!.isNotEmpty;
-          return Container(
+        return SliverAppBar(
+          expandedHeight: isDesktop ? 350 : hasCoupons ? 400 : 300,
+          toolbarHeight: isDesktop ? 150 : 90,
+          pinned: true, floating: false, elevation: 0.5,
+          backgroundColor: Theme.of(context).cardColor,
+          leading: !isDesktop ? IconButton(
+            icon: Container(
+              height: 50, width: 50,
+              decoration: BoxDecoration(shape: BoxShape.circle, color: Theme.of(context).primaryColor),
+              alignment: Alignment.center,
+              padding: const EdgeInsets.only(right: Dimensions.paddingSizeExtraSmall),
+              child: Icon(Icons.chevron_left, color: Theme.of(context).cardColor, size: 28),
+            ),
+            onPressed: () => Get.back(),
+          ) : const SizedBox(),
+
+          flexibleSpace: Container(
             margin: isDesktop ? EdgeInsets.symmetric(horizontal: realSpaceNeeded) : EdgeInsets.zero,
             child: FlexibleSpaceBar(
               titlePadding: EdgeInsets.zero,
@@ -63,17 +63,17 @@ class RestaurantInfoSectionWidget extends StatelessWidget {
                     child: Align(
                       alignment: Alignment.bottomLeft,
                       child: Container(
-                        height: (hasCoupon ? 260 : 160) - (scrollingRate * 25),
+                        height: (hasCoupons ? 260 : 160) - (scrollingRate * 25),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).cardColor,
-                          borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1 - (0.1 * scrollingRate)), blurRadius: 10)]
+                            color: Theme.of(context).cardColor,
+                            borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1 - (0.1 * scrollingRate)), blurRadius: 10)]
                         ),
                         margin: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeSmall),
                         padding: EdgeInsets.only(
-                          left: Get.find<LocalizationController>().isLtr ? 20 : 0,
-                          right: Get.find<LocalizationController>().isLtr ? 0 : 20,
-                          top: scrollingRate * (context.height * 0.035)
+                            left: Get.find<LocalizationController>().isLtr ? 20 : 0,
+                            right: Get.find<LocalizationController>().isLtr ? 0 : 20,
+                            top: scrollingRate * (context.height * 0.035)
                         ),
                         child: Padding(
                           padding: EdgeInsets.symmetric(vertical: Dimensions.paddingSizeExtraSmall - (scrollingRate * Dimensions.paddingSizeExtraSmall)),
@@ -82,7 +82,7 @@ class RestaurantInfoSectionWidget extends StatelessWidget {
                             InfoViewWidget(restaurant: restaurant, restController: restController, scrollingRate: scrollingRate),
                             SizedBox(height: Dimensions.paddingSizeLarge - (scrollingRate * (isDesktop ? 2 : Dimensions.paddingSizeLarge))),
 
-                            scrollingRate < 0.8 ? CouponViewWidget(scrollingRate: scrollingRate) : const SizedBox(),
+                            if(hasCoupons) scrollingRate < 0.8 ? CouponViewWidget(scrollingRate: scrollingRate) : const SizedBox(),
 
                           ]),
                         ),
@@ -135,7 +135,7 @@ class RestaurantInfoSectionWidget extends StatelessWidget {
                               children: [
                                 Row(children: [
 
-                                  SizedBox(width: 250 /*(context.width * 0.17)*/ - (scrollingRate * 90)),
+                                  SizedBox(width: 250 - (scrollingRate * 90)),
 
                                   Expanded(child: InfoViewWidget(restaurant: restaurant, restController: restController, scrollingRate: scrollingRate)),
                                   const SizedBox(width: Dimensions.paddingSizeSmall),
@@ -146,10 +146,10 @@ class RestaurantInfoSectionWidget extends StatelessWidget {
 
                                 Positioned(left: Get.find<LocalizationController>().isLtr ? 30 : null, right: Get.find<LocalizationController>().isLtr ? null : 30, top: - 80 + (scrollingRate * 77), child: Container(
                                   decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Theme.of(context).cardColor,
-                                    border: Border.all(color: Theme.of(context).primaryColor, width: 0.2),
-                                    boxShadow: [BoxShadow(color: Theme.of(context).primaryColor.withValues(alpha: 0.3), blurRadius: 10)]
+                                      shape: BoxShape.circle,
+                                      color: Theme.of(context).cardColor,
+                                      border: Border.all(color: Theme.of(context).primaryColor, width: 0.2),
+                                      boxShadow: [BoxShadow(color: Theme.of(context).primaryColor.withValues(alpha: 0.3), blurRadius: 10)]
                                   ),
                                   padding: const EdgeInsets.all(2),
                                   child: ClipRRect(
@@ -188,7 +188,7 @@ class RestaurantInfoSectionWidget extends StatelessWidget {
                 },
               ),
               background: Container(
-                margin: EdgeInsets.only(bottom: isDesktop ? 100 : (hasCoupon ? 200 : 100)),
+                margin: EdgeInsets.only(bottom: isDesktop ? 100 : (hasCoupons ? 200 : 100)),
                 child: ClipRRect(
                   borderRadius: const BorderRadius.vertical(bottom: Radius.circular(Dimensions.radiusLarge)),
                   child: CustomImageWidget(
@@ -200,10 +200,10 @@ class RestaurantInfoSectionWidget extends StatelessWidget {
                 ),
               ),
             ),
-          );
-        }
-      ),
-      actions: const [SizedBox()],
+          ),
+          actions: const [SizedBox()],
+        );
+      }
     );
   }
 }

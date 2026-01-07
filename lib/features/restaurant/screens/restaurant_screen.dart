@@ -69,7 +69,6 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
         widget.restaurant!.id ?? Get.find<RestaurantController>().restaurant!.id!, 1, 'all', false);
   }
 
-  // Photo Frame Decoration - same as WhatOnYourMindViewWidget
   BoxDecoration _photoFrameDecoration(BuildContext context) {
     return BoxDecoration(
       color: Theme.of(context).cardColor,
@@ -95,311 +94,303 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
       endDrawerEnableOpenDragGesture: false,
       backgroundColor: Theme.of(context).cardColor,
       body: GetBuilder<RestaurantController>(builder: (restController) {
-        return GetBuilder<CouponController>(builder: (couponController) {
-          return GetBuilder<CategoryController>(builder: (categoryController) {
-            Restaurant? restaurant;
-            if (restController.restaurant != null &&
-                restController.restaurant!.name != null &&
-                categoryController.categoryList != null) {
-              restaurant = restController.restaurant;
-            }
-            restController.setCategoryList();
-            bool hasCoupon = couponController.couponList != null && couponController.couponList!.isNotEmpty;
+        return GetBuilder<CategoryController>(builder: (categoryController) {
+          Restaurant? restaurant;
+          if (restController.restaurant != null &&
+              restController.restaurant!.name != null &&
+              categoryController.categoryList != null) {
+            restaurant = restController.restaurant;
+          }
+          restController.setCategoryList();
 
-            return (restController.restaurant != null &&
-                restController.restaurant!.name != null &&
-                categoryController.categoryList != null)
-                ? CustomScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              controller: scrollController,
-              slivers: [
-                RestaurantInfoSectionWidget(
-                    restaurant: restaurant!, restController: restController, hasCoupon: hasCoupon),
+          return (restController.restaurant != null &&
+              restController.restaurant!.name != null &&
+              categoryController.categoryList != null)
+              ? CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            controller: scrollController,
+            slivers: [
+              RestaurantInfoSectionWidget(
+                  restaurant: restaurant!, restController: restController),
 
-                // Discount + Announcement + Recommended (unchanged)
-                SliverToBoxAdapter(
-                  child: Center(
+              SliverToBoxAdapter(
+                child: Center(
+                  child: Container(
+                    width: Dimensions.webMaxWidth,
+                    color: Theme.of(context).cardColor,
+                    child: Column(children: [
+
+                    ]),
+                  ),
+                ),
+              ),
+
+              if (restController.categoryList!.isNotEmpty)
+                SliverPersistentHeader(
+                  pinned: true,
+                  delegate: SliverDelegate(
+                    height: 115,
                     child: Container(
-                      width: Dimensions.webMaxWidth,
                       color: Theme.of(context).cardColor,
                       child: Column(children: [
-                        // ... Discount Banner, Announcement, Recommended Items (unchanged - omitted for brevity)
-                        // Keep your original code here
+
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              left: Dimensions.paddingSizeDefault,
+                              right: Dimensions.paddingSizeDefault,
+                              top: Dimensions.paddingSizeSmall),
+                          child: Row(children: [
+                            Text('all_food_items'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault)),
+                            const Expanded(child: SizedBox()),
+                            if (isDesktop)
+                              Container(
+                                padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
+                                height: 35,
+                                width: 320,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(25),
+                                  color: Theme.of(context).cardColor,
+                                  border: Border.all(color: Theme.of(context).primaryColor, width: 0.3),
+                                ),
+                                child: TextField(
+                                  controller: _searchController,
+                                  textInputAction: TextInputAction.search,
+                                  decoration: InputDecoration(
+                                    hintText: 'search_for_your_food'.tr,
+                                    hintStyle: robotoRegular.copyWith(
+                                        fontSize: Dimensions.fontSizeSmall,
+                                        color: Theme.of(context).disabledColor),
+                                    border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                                        borderSide: BorderSide.none),
+                                    filled: true,
+                                    fillColor: Theme.of(context).cardColor,
+                                    isDense: true,
+                                    prefixIcon: InkWell(
+                                      onTap: () {
+                                        if (!restController.isSearching) {
+                                          Get.find<RestaurantController>().getRestaurantSearchProductList(
+                                            _searchController.text.trim(),
+                                            restController.restaurant!.id.toString(),
+                                            1,
+                                            restController.type,
+                                          );
+                                        } else {
+                                          _searchController.clear();
+                                          restController.initSearchData();
+                                          restController.changeSearchStatus();
+                                        }
+                                      },
+                                      child: Icon(
+                                          restController.isSearching ? Icons.clear : CupertinoIcons.search,
+                                          color: Theme.of(context).primaryColor.withOpacity(0.5)),
+                                    ),
+                                  ),
+                                  onSubmitted: (value) {
+                                    if (value.isNotEmpty) {
+                                      restController.getRestaurantSearchProductList(
+                                        value.trim(),
+                                        restController.restaurant!.id.toString(),
+                                        1,
+                                        restController.type,
+                                      );
+                                    }
+                                  },
+                                ),
+                              )
+                            else
+                              InkWell(
+                                onTap: () async {
+                                  await Get.toNamed(RouteHelper.getSearchRestaurantProductRoute(restaurant!.id));
+                                  if (restController.isSearching) restController.changeSearchStatus();
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                                    color: Theme.of(context).primaryColor.withOpacity(0.1),
+                                  ),
+                                  padding: const EdgeInsets.all(Dimensions.paddingSizeSmall - 2),
+                                  child: Image.asset(Images.search,
+                                      height: 18, width: 18, color: Theme.of(context).primaryColor),
+                                ),
+                              ),
+                            if (restController.type.isNotEmpty)
+                              VegFilterWidget(
+                                type: restController.type,
+                                iconColor: Theme.of(context).primaryColor,
+                                onSelected: (String type) {
+                                  restController.getRestaurantProductList(restController.restaurant!.id, 1, type, true);
+                                },
+                              ),
+                          ]),
+                        ),
+                        const Divider(thickness: 0.2, height: 5),
+
+                        Expanded(
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.only(left: Dimensions.paddingSizeDefault),
+                            physics: const BouncingScrollPhysics(),
+                            itemCount: restController.categoryList!.length,
+                            itemBuilder: (context, index) {
+                              final category = restController.categoryList![index];
+                              final bool isSelected = index == restController.categoryIndex;
+                              const double imageSize = 30;
+
+                              if (index == 0) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: Dimensions.paddingSizeDefault, bottom: 0),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+
+                                      InkWell(
+                                        onTap: () => restController.setCategoryIndex(index),
+                                        borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                                        child: Container(
+                                          height: imageSize,
+                                          padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
+                                          decoration: BoxDecoration(
+                                            color: isSelected
+                                                ? Theme.of(context).primaryColor.withOpacity(0.1)
+                                                : Colors.transparent,
+                                            borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                                            border: Border.all(
+                                              color: isSelected ? Theme.of(context).primaryColor : Colors.grey.withOpacity(0.2),
+                                              width: 1,
+                                            ),
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              category.name!,
+                                              style: robotoMedium.copyWith(
+                                                fontSize: Dimensions.fontSizeSmall,
+                                                color: isSelected
+                                                    ? Theme.of(context).primaryColor
+                                                    : Theme.of(context).textTheme.bodyLarge?.color,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+
+                                      const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+                                      const SizedBox(height: 10),
+                                    ],
+                                  ),
+                                );
+                              }
+
+                              return InkWell(
+                                onTap: () => restController.setCategoryIndex(index),
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                    right: Dimensions.paddingSizeDefault,
+                                    bottom: 0,
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        decoration: isSelected
+                                            ? _photoFrameDecoration(context)
+                                            : BoxDecoration(
+                                          color: Theme.of(context).cardColor,
+                                          borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(100),
+                                          child: CustomImageWidget(
+                                            image: category.imageFullUrl ?? '',
+                                            height: 40,
+                                            width: 40,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+
+                                      SizedBox(
+                                        width: imageSize + 30,
+                                        child: Text(
+                                          category.name!,
+                                          style: robotoMedium.copyWith(
+                                            fontSize: Dimensions.fontSizeExtraSmall,
+                                            color: isSelected
+                                                ? Theme.of(context).primaryColor
+                                                : Theme.of(context).textTheme.bodyLarge?.color,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
                       ]),
                     ),
                   ),
                 ),
 
-                // Category Tabs - "All" = Text Only, Others = Image + Text
-                if (restController.categoryList!.isNotEmpty)
-                  SliverPersistentHeader(
-                    pinned: true,
-                    delegate: SliverDelegate(
-                      height: 115,
-                      child: Container(
-                        color: Theme.of(context).cardColor,
-                        child: Column(children: [
-                          // Search + Filter Row
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                left: Dimensions.paddingSizeDefault,
-                                right: Dimensions.paddingSizeDefault,
-                                top: Dimensions.paddingSizeSmall),
-                            child: Row(children: [
-                              Text('all_food_items'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault)),
-                              const Expanded(child: SizedBox()),
-                              if (isDesktop)
-                                Container(
-                                  padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
-                                  height: 35,
-                                  width: 320,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(25),
-                                    color: Theme.of(context).cardColor,
-                                    border: Border.all(color: Theme.of(context).primaryColor, width: 0.3),
-                                  ),
-                                  child: TextField(
-                                    controller: _searchController,
-                                    textInputAction: TextInputAction.search,
-                                    decoration: InputDecoration(
-                                      hintText: 'search_for_your_food'.tr,
-                                      hintStyle: robotoRegular.copyWith(
-                                          fontSize: Dimensions.fontSizeSmall,
-                                          color: Theme.of(context).disabledColor),
-                                      border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-                                          borderSide: BorderSide.none),
-                                      filled: true,
-                                      fillColor: Theme.of(context).cardColor,
-                                      isDense: true,
-                                      prefixIcon: InkWell(
-                                        onTap: () {
-                                          if (!restController.isSearching) {
-                                            Get.find<RestaurantController>().getRestaurantSearchProductList(
-                                              _searchController.text.trim(),
-                                              restController.restaurant!.id.toString(),
-                                              1,
-                                              restController.type,
-                                            );
-                                          } else {
-                                            _searchController.clear();
-                                            restController.initSearchData();
-                                            restController.changeSearchStatus();
-                                          }
-                                        },
-                                        child: Icon(
-                                            restController.isSearching ? Icons.clear : CupertinoIcons.search,
-                                            color: Theme.of(context).primaryColor.withOpacity(0.5)),
-                                      ),
-                                    ),
-                                    onSubmitted: (value) {
-                                      if (value.isNotEmpty) {
-                                        restController.getRestaurantSearchProductList(
-                                          value.trim(),
-                                          restController.restaurant!.id.toString(),
-                                          1,
-                                          restController.type,
-                                        );
-                                      }
-                                    },
-                                  ),
-                                )
-                              else
-                                InkWell(
-                                  onTap: () async {
-                                    await Get.toNamed(RouteHelper.getSearchRestaurantProductRoute(restaurant!.id));
-                                    if (restController.isSearching) restController.changeSearchStatus();
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                                      color: Theme.of(context).primaryColor.withOpacity(0.1),
-                                    ),
-                                    padding: const EdgeInsets.all(Dimensions.paddingSizeSmall - 2),
-                                    child: Image.asset(Images.search,
-                                        height: 18, width: 18, color: Theme.of(context).primaryColor),
-                                  ),
-                                ),
-                              if (restController.type.isNotEmpty)
-                                VegFilterWidget(
-                                  type: restController.type,
-                                  iconColor: Theme.of(context).primaryColor,
-                                  onSelected: (String type) {
-                                    restController.getRestaurantProductList(restController.restaurant!.id, 1, type, true);
-                                  },
-                                ),
-                            ]),
-                          ),
-                          const Divider(thickness: 0.2, height: 5),
-
-                          Expanded(
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              padding: const EdgeInsets.only(left: Dimensions.paddingSizeDefault),
-                              physics: const BouncingScrollPhysics(),
-                              itemCount: restController.categoryList!.length,
-                              itemBuilder: (context, index) {
-                                final category = restController.categoryList![index];
-                                final bool isSelected = index == restController.categoryIndex;
-                                const double imageSize = 30; // Consistent height reference
-
-                                // 1. "ALL" CATEGORY REDESIGN
-                                if (index == 0) {
-                                  return Padding(
-                                    padding: const EdgeInsets.only(right: Dimensions.paddingSizeDefault, bottom: 0),
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        // This InkWell now only wraps the "Text Box" area
-                                        InkWell(
-                                          onTap: () => restController.setCategoryIndex(index),
-                                          borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                                          child: Container(
-                                            height: imageSize, // Match the height of the other categories' images
-                                            padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
-                                            decoration: BoxDecoration(
-                                              color: isSelected
-                                                  ? Theme.of(context).primaryColor.withOpacity(0.1)
-                                                  : Colors.transparent,
-                                              borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                                              border: Border.all(
-                                                color: isSelected ? Theme.of(context).primaryColor : Colors.grey.withOpacity(0.2),
-                                                width: 1,
-                                              ),
-                                            ),
-                                            child: Center(
-                                              child: Text(
-                                                category.name!,
-                                                style: robotoMedium.copyWith(
-                                                  fontSize: Dimensions.fontSizeSmall,
-                                                  color: isSelected
-                                                      ? Theme.of(context).primaryColor
-                                                      : Theme.of(context).textTheme.bodyLarge?.color,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        // Empty space at bottom to maintain alignment with other category labels
-                                        const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-                                        const SizedBox(height: 10), // Placeholder for the missing label height
-                                      ],
-                                    ),
-                                  );
-                                }
-
-                                // 2. OTHER CATEGORIES
-                                return InkWell(
-                                  onTap: () => restController.setCategoryIndex(index),
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                      right: Dimensions.paddingSizeDefault,
-                                      bottom: 0,
-                                    ),
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Container(
-                                          // padding: const EdgeInsets.all(4),
-                                          decoration: isSelected
-                                              ? _photoFrameDecoration(context)
-                                              : BoxDecoration(
-                                            color: Theme.of(context).cardColor,
-                                            borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                                          ),
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(100),
-                                            child: CustomImageWidget(
-                                              image: category.imageFullUrl ?? '',
-                                              height: 40,
-                                              width: 40,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                        ),
-                                        // const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-                                        SizedBox(
-                                          width: imageSize + 30,
-                                          child: Text(
-                                            category.name!,
-                                            style: robotoMedium.copyWith(
-                                              fontSize: Dimensions.fontSizeExtraSmall,
-                                              color: isSelected
-                                                  ? Theme.of(context).primaryColor
-                                                  : Theme.of(context).textTheme.bodyLarge?.color,
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ]),
-                      ),
-                    ),
-                  ),
-
-                // Product List
-                SliverToBoxAdapter(
-                  child: FooterViewWidget(
-                    child: Container(
-                      width: Dimensions.webMaxWidth,
-                      child: PaginatedListViewWidget(
-                        scrollController: scrollController,
-                        onPaginate: (int? offset) {
-                          if (restController.isSearching) {
-                            restController.getRestaurantSearchProductList(
-                              restController.searchText,
-                              restController.restaurant!.id.toString(),
-                              offset!,
-                              restController.type,
-                            );
-                          } else {
-                            restController.getRestaurantProductList(
-                                restController.restaurant!.id, offset!, restController.type, false);
-                          }
-                        },
-                        totalSize: restController.isSearching
-                            ? restController.restaurantSearchProductModel?.totalSize
-                            : restController.restaurantProducts != null
-                            ? restController.foodPageSize
+              SliverToBoxAdapter(
+                child: FooterViewWidget(
+                  child: Container(
+                    width: Dimensions.webMaxWidth,
+                    child: PaginatedListViewWidget(
+                      scrollController: scrollController,
+                      onPaginate: (int? offset) {
+                        if (restController.isSearching) {
+                          restController.getRestaurantSearchProductList(
+                            restController.searchText,
+                            restController.restaurant!.id.toString(),
+                            offset!,
+                            restController.type,
+                          );
+                        } else {
+                          restController.getRestaurantProductList(
+                              restController.restaurant!.id, offset!, restController.type, false);
+                        }
+                      },
+                      totalSize: restController.isSearching
+                          ? restController.restaurantSearchProductModel?.totalSize
+                          : restController.restaurantProducts != null
+                          ? restController.foodPageSize
+                          : null,
+                      offset: restController.isSearching
+                          ? restController.restaurantSearchProductModel?.offset
+                          : restController.restaurantProducts != null
+                          ? restController.foodPageOffset
+                          : null,
+                      productView: ProductViewWidget(
+                        isRestaurant: false,
+                        restaurants: null,
+                        products: restController.isSearching
+                            ? restController.restaurantSearchProductModel?.products
+                            : restController.categoryList!.isNotEmpty
+                            ? restController.restaurantProducts
                             : null,
-                        offset: restController.isSearching
-                            ? restController.restaurantSearchProductModel?.offset
-                            : restController.restaurantProducts != null
-                            ? restController.foodPageOffset
-                            : null,
-                        productView: ProductViewWidget(
-                          isRestaurant: false,
-                          restaurants: null,
-                          products: restController.isSearching
-                              ? restController.restaurantSearchProductModel?.products
-                              : restController.categoryList!.isNotEmpty
-                              ? restController.restaurantProducts
-                              : null,
-                          inRestaurantPage: true,
-                          showDiscount: false,
-                          padding: const EdgeInsets.only(
-                            left: Dimensions.paddingSizeDefault,
-                            right: Dimensions.paddingSizeDefault,
-                            top: 0,
-                            bottom: Dimensions.paddingSizeDefault,
-                          ),
+                        inRestaurantPage: true,
+                        showDiscount: false,
+                        imageHeight: 120,
+                        imageWidth: 108,
+                        padding: const EdgeInsets.only(
+                          left: Dimensions.paddingSizeDefault,
+                          right: Dimensions.paddingSizeDefault,
+                          top: 0,
+                          bottom: Dimensions.paddingSizeDefault,
                         ),
                       ),
                     ),
                   ),
                 ),
-              ],
-            )
-                : const RestaurantScreenShimmerWidget();
-          });
+              ),
+            ],
+          )
+              : const RestaurantScreenShimmerWidget();
         });
       }),
 

@@ -50,8 +50,8 @@ class RestaurantService implements RestaurantServiceInterface {
   }
 
   @override
-  Future<RestaurantModel?> getRestaurantList(int offset, String filterBy, int topRated, int discount, int veg, int nonVeg, {bool fromMap = false, DataSourceEnum? source}) async {
-    return await restaurantRepositoryInterface.getList(offset: offset, filterBy: filterBy, topRated: topRated, discount: discount, veg: veg, nonVeg: nonVeg, fromMap: fromMap, source: source);
+  Future<RestaurantModel?> getRestaurantList(int offset, String filterBy, int topRated, int discount, int veg, int nonVeg, {bool fromMap = false, double? pinLat, double? pinLng, int? radius, DataSourceEnum? source}) async {
+    return await restaurantRepositoryInterface.getList(offset: offset, filterBy: filterBy, topRated: topRated, discount: discount, veg: veg, nonVeg: nonVeg, fromMap: fromMap, pinLat: pinLat, pinLng: pinLng, radius: radius, source: source);
   }
 
   @override
@@ -65,13 +65,13 @@ class RestaurantService implements RestaurantServiceInterface {
   }
 
   @override
-  Future<List<Restaurant>?> getPopularRestaurantList(String type, {DataSourceEnum? source}) async {
-    return await restaurantRepositoryInterface.getRestaurantList(type: type, isPopular: true, source: source);
+  Future<List<Restaurant>?> getPopularRestaurantList(String type, {DataSourceEnum? source, double? pinLat, double? pinLng, int? radius}) async {
+    return await restaurantRepositoryInterface.getRestaurantList(type: type, isPopular: true, source: source, pinLat: pinLat, pinLng: pinLng, radius: radius);
   }
 
   @override
-  Future<List<Restaurant>?> getLatestRestaurantList(String type, {DataSourceEnum? source}) async {
-    return await restaurantRepositoryInterface.getRestaurantList(type: type, isLatest: true, source: source);
+  Future<List<Restaurant>?> getLatestRestaurantList(String type, {DataSourceEnum? source, double? pinLat, double? pinLng, int? radius}) async {
+    return await restaurantRepositoryInterface.getRestaurantList(type: type, isLatest: true, source: source, pinLat: pinLat, pinLng: pinLng, radius: radius);
   }
 
   @override

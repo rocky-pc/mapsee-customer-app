@@ -1,7 +1,10 @@
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:stackfood_multivendor/common/enums/data_source_enum.dart';
 import 'package:stackfood_multivendor/features/home/domain/models/advertisement_model.dart';
 import 'package:stackfood_multivendor/features/home/domain/services/advertisement_service_interface.dart';
+import 'package:stackfood_multivendor/features/restaurant/controllers/restaurant_controller.dart';
+import 'package:stackfood_multivendor/util/app_constants.dart';
 
 class AdvertisementController extends GetxController implements GetxService {
   final AdvertisementServiceInterface advertisementServiceInterface;
@@ -35,7 +38,22 @@ class AdvertisementController extends GetxController implements GetxService {
   void _prepareAdvertisement(List<AdvertisementModel>? advertisementList) {
     if (advertisementList != null) {
       _advertisementList = [];
-      _advertisementList = advertisementList;
+      final restController = Get.find<RestaurantController>();
+      for (var advertisement in advertisementList) {
+        if(advertisement.restaurantLatitude != null && advertisement.restaurantLongitude != null) {
+          try {
+            double distance = restController.getRestaurantDistance(LatLng(
+              double.parse(advertisement.restaurantLatitude!),
+              double.parse(advertisement.restaurantLongitude!),
+            ));
+            if (distance <= AppConstants.restaurantActiveDistance) {
+              _advertisementList!.add(advertisement);
+            }
+          } catch (e) {
+            //ignore
+          }
+        }
+      }
     }
     update();
   }

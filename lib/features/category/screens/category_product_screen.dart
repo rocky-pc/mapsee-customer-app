@@ -1,9 +1,12 @@
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:stackfood_multivendor/common/models/product_model.dart';
 import 'package:stackfood_multivendor/common/models/restaurant_model.dart';
 import 'package:stackfood_multivendor/common/widgets/product_view_widget.dart';
 import 'package:stackfood_multivendor/features/category/controllers/category_controller.dart';
+import 'package:stackfood_multivendor/features/restaurant/controllers/restaurant_controller.dart';
 import 'package:stackfood_multivendor/helper/responsive_helper.dart';
 import 'package:stackfood_multivendor/helper/route_helper.dart';
+import 'package:stackfood_multivendor/util/app_constants.dart';
 import 'package:stackfood_multivendor/util/dimensions.dart';
 import 'package:stackfood_multivendor/util/styles.dart';
 import 'package:stackfood_multivendor/common/widgets/cart_widget.dart';
@@ -88,6 +91,24 @@ class CategoryProductScreenState extends State<CategoryProductScreen> with Ticke
         } else {
           restaurants.addAll(catController.categoryRestaurantList!);
         }
+      }
+
+      if (restaurants != null) {
+        final restController = Get.find<RestaurantController>();
+        restaurants = restaurants.where((restaurant) {
+          if(restaurant.latitude != null && restaurant.longitude != null) {
+            try {
+              double distance = restController.getRestaurantDistance(LatLng(
+                double.parse(restaurant.latitude!),
+                double.parse(restaurant.longitude!),
+              ));
+              return distance <= AppConstants.restaurantActiveDistance;
+            } catch (e) {
+              return false;
+            }
+          }
+          return false;
+        }).toList();
       }
 
       return PopScope(

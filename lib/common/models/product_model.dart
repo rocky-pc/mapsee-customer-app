@@ -60,6 +60,8 @@ class Product {
   String? restaurantName;
   double? restaurantDiscount;
   int? restaurantStatus;
+  String? restaurantLatitude;
+  String? restaurantLongitude;
   bool? scheduleOrder;
   double? avgRating;
   int? ratingCount;
@@ -96,6 +98,8 @@ class Product {
     this.restaurantName,
     this.restaurantDiscount,
     this.restaurantStatus,
+    this.restaurantLatitude,
+    this.restaurantLongitude,
     this.scheduleOrder,
     this.avgRating,
     this.ratingCount,
@@ -159,6 +163,8 @@ class Product {
     restaurantName = json['restaurant_name'];
     restaurantDiscount = json['restaurant_discount'].toDouble();
     restaurantStatus = json['restaurant_status'];
+    restaurantLatitude = json['restaurant_latitude'];
+    restaurantLongitude = json['restaurant_longitude'];
     scheduleOrder = json['schedule_order'];
     avgRating = json['avg_rating'].toDouble();
     ratingCount = json['rating_count'];
@@ -228,6 +234,8 @@ class Product {
     data['restaurant_name'] = restaurantName;
     data['restaurant_discount'] = restaurantDiscount;
     data['restaurant_status'] = restaurantStatus;
+    data['restaurant_latitude'] = restaurantLatitude;
+    data['restaurant_longitude'] = restaurantLongitude;
     data['schedule_order'] = scheduleOrder;
     data['avg_rating'] = avgRating;
     data['rating_count'] = ratingCount;

@@ -1,8 +1,10 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 // Your existing imports
+import 'package:stackfood_multivendor/common/models/restaurant_model.dart';
 import 'package:stackfood_multivendor/features/home/widgets/arrow_icon_button_widget.dart';
 import 'package:stackfood_multivendor/features/home/widgets/restaurants_card_widget.dart';
 import 'package:stackfood_multivendor/features/restaurant/controllers/restaurant_controller.dart';
@@ -24,7 +26,28 @@ class NewOnStackFoodViewWidget extends StatelessWidget {
     final Color glassmorphismColor = Theme.of(context).primaryColor;
 
     return GetBuilder<RestaurantController>(builder: (restController) {
-      return (restController.latestRestaurantList != null && restController.latestRestaurantList!.isEmpty) ? const SizedBox() : Padding(
+
+      List<Restaurant>? restaurantList = restController.latestRestaurantList;
+
+      if (restaurantList != null) {
+        restaurantList = restaurantList.where((restaurant) {
+          if(restaurant.latitude != null && restaurant.longitude != null) {
+            try {
+              double distance = restController.getRestaurantDistance(LatLng(
+                double.parse(restaurant.latitude!),
+                double.parse(restaurant.longitude!),
+              ));
+              return distance <= AppConstants.restaurantActiveDistance;
+            } catch (e) {
+              return false;
+            }
+          }
+          return false;
+        }).toList();
+      }
+
+
+      return (restaurantList != null && restaurantList.isEmpty) ? const SizedBox() : Padding(
         padding: EdgeInsets.symmetric(vertical: ResponsiveHelper.isMobile(context) ? Dimensions.paddingSizeDefault : Dimensions.paddingSizeLarge),
         child: Center(
           child: SizedBox(
@@ -75,11 +98,11 @@ class NewOnStackFoodViewWidget extends StatelessWidget {
                         ]),
                       ),
 
-                      restController.latestRestaurantList != null ? SizedBox(
+                      restaurantList != null ? SizedBox(
                         height: 150,
                         child: ListView.builder(
                           padding: const EdgeInsets.only(right: Dimensions.paddingSizeDefault),
-                          itemCount: restController.latestRestaurantList!.length,
+                          itemCount: restaurantList.length,
                           shrinkWrap: true,
                           scrollDirection: Axis.horizontal,
                           physics: const BouncingScrollPhysics(),
@@ -89,13 +112,13 @@ class NewOnStackFoodViewWidget extends StatelessWidget {
                               child: InkWell(
                                 onTap: () {
                                   Get.toNamed(
-                                    RouteHelper.getRestaurantRoute(restController.latestRestaurantList![index].id),
-                                    arguments: RestaurantScreen(restaurant: restController.latestRestaurantList![index]),
+                                    RouteHelper.getRestaurantRoute(restaurantList![index].id),
+                                    arguments: RestaurantScreen(restaurant: restaurantList![index]),
                                   );
                                 },
                                 child: RestaurantsCardWidget(
                                   isNewOnStackFood: true,
-                                  restaurant: restController.latestRestaurantList![index],
+                                  restaurant: restaurantList![index],
                                 ),
                               ),
                             );

@@ -112,8 +112,7 @@ class RestaurantView extends StatelessWidget {
   });
 
   Future<List<cm.CouponModel>?> _getCoupons(int restaurantId) async {
-    await Get.find<CouponController>().getRestaurantCouponList(restaurantId: restaurantId);
-    return Get.find<CouponController>().couponList;
+    return await Get.find<CouponController>().getRestaurantCouponList(restaurantId: restaurantId, setActive: false);
   }
 
   @override

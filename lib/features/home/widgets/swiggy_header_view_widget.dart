@@ -3,16 +3,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:stackfood_multivendor/features/home/widgets/bad_weather_widget.dart';
+import 'package:stackfood_multivendor/features/home/widgets/snowfall_animation_widget.dart';
 import 'package:stackfood_multivendor/features/location/controllers/location_controller.dart';
 import 'package:stackfood_multivendor/helper/address_helper.dart';
 import 'package:stackfood_multivendor/helper/auth_helper.dart';
 import 'package:stackfood_multivendor/helper/responsive_helper.dart';
 import 'package:stackfood_multivendor/helper/route_helper.dart';
-import 'package:stackfood_multivendor/helper/voice_permission_handler.dart';
 import 'package:stackfood_multivendor/util/dimensions.dart';
 import 'package:stackfood_multivendor/util/styles.dart';
 
-// --- UPDATED HEADER (Accepts showIcon) ---
 class SwiggyHeaderWidget extends StatelessWidget {
   final bool showIcon; // Controls if the static icon is visible
   const SwiggyHeaderWidget({super.key, this.showIcon = true});
@@ -21,96 +20,123 @@ class SwiggyHeaderWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: Dimensions.webMaxWidth,
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: Dimensions.paddingSizeSmall),
       decoration: BoxDecoration(
         color: Theme.of(context).primaryColor,
         borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(Dimensions.radiusExtraLarge),
-          bottomRight: Radius.circular(Dimensions.radiusExtraLarge),
+          // bottomLeft: Radius.circular(Dimensions.radiusExtraLarge),
+          // bottomRight: Radius.circular(Dimensions.radiusExtraLarge),
         ),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Stack(
         children: [
-          Expanded(
-            child: InkWell(
-              onTap: () => Get.toNamed(RouteHelper.getAccessLocationRoute('home')),
-              child: Padding(
-                padding: const EdgeInsets.only(right: Dimensions.paddingSizeSmall),
-                child: GetBuilder<LocationController>(builder: (locationController) {
-                  String fullAddress = AuthHelper.isLoggedIn() &&
-                      AddressHelper.getAddressFromSharedPref() != null
-                      ? AddressHelper.getAddressFromSharedPref()!.address!
-                      : 'your_location'.tr;
 
-                  List<String> addressParts = fullAddress.split(',');
-                  String displayTitle = addressParts.isNotEmpty ? addressParts[0].trim() : 'Unknown';
-                  if (addressParts.length >= 2) {
-                    displayTitle = addressParts[1].trim();
-                  }
+          Positioned.fill(
+            child: ClipRRect(
+              borderRadius: const BorderRadius.only(
+                // bottomLeft: Radius.circular(Dimensions.radiusExtraLarge),
+                // bottomRight: Radius.circular(Dimensions.radiusExtraLarge),
+              ),
+              child: LayoutBuilder(builder: (context, constraints) {
+                if (constraints.maxHeight.isFinite && constraints.maxHeight > 0) {
+                  return IgnorePointer(
+                    ignoring: true,
+                    child: SnowfallAnimationWidget(
+                      width: constraints.maxWidth,
+                      height: constraints.maxHeight,
+                    ),
+                  );
+                }
+                return const SizedBox.shrink();
+              }),
+            ),
+          ),
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          // Only show this icon if the animation has finished (showIcon is true)
-                          AnimatedOpacity(
-                            duration: const Duration(milliseconds: 300),
-                            opacity: showIcon ? 1.0 : 0.0,
-                            child: Icon(
-                                CupertinoIcons.location_fill,
-                                size: 18,
-                                color: Theme.of(context).cardColor
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: Dimensions.paddingSizeSmall),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: InkWell(
+                    onTap: () => Get.toNamed(RouteHelper.getAccessLocationRoute('home')),
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: Dimensions.paddingSizeSmall),
+                      child: GetBuilder<LocationController>(builder: (locationController) {
+                        String fullAddress = AuthHelper.isLoggedIn() &&
+                            AddressHelper.getAddressFromSharedPref() != null
+                            ? AddressHelper.getAddressFromSharedPref()!.address!
+                            : 'your_location'.tr;
+
+                        List<String> addressParts = fullAddress.split(',');
+                        String displayTitle = addressParts.isNotEmpty ? addressParts[0].trim() : 'Unknown';
+                        if (addressParts.length >= 2) {
+                          displayTitle = addressParts[1].trim();
+                        }
+
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                AnimatedOpacity(
+                                  duration: const Duration(milliseconds: 300),
+                                  opacity: showIcon ? 1.0 : 0.0,
+                                  child: Icon(
+                                      CupertinoIcons.location_fill,
+                                      size: 18,
+                                      color: Theme.of(context).cardColor
+                                  ),
+                                ),
+                                const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                                Flexible(
+                                  child: Text(
+                                    displayTitle,
+                                    style: robotoMedium.copyWith(
+                                        color: Theme.of(context).cardColor,
+                                        fontSize: Dimensions.fontSizeLarge, fontWeight: FontWeight.w600),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                Icon(Icons.keyboard_arrow_down,
+                                    size: 20, color: Theme.of(context).cardColor),
+                              ],
                             ),
-                          ),
-                          const SizedBox(width: Dimensions.paddingSizeExtraSmall),
-                          Flexible(
-                            child: Text(
-                              displayTitle,
-                              style: robotoMedium.copyWith(
-                                  color: Theme.of(context).cardColor,
-                                  fontSize: Dimensions.fontSizeLarge, fontWeight: FontWeight.w600),
+                            Text(
+                              fullAddress,
+                              style: robotoRegular.copyWith(
+                                  color: Theme.of(context).cardColor.withOpacity(0.8),
+                                  fontSize: Dimensions.fontSizeExtraSmall),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
-                          ),
-                          Icon(Icons.keyboard_arrow_down,
-                              size: 20, color: Theme.of(context).cardColor),
-                        ],
-                      ),
-                      Text(
-                        fullAddress,
-                        style: robotoRegular.copyWith(
-                            color: Theme.of(context).cardColor.withOpacity(0.8),
-                            fontSize: Dimensions.fontSizeExtraSmall),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  );
-                }),
-              ),
-            ),
-          ),
-          Row(
-            children: [
-              const BadWeatherWidget(),
-              const SizedBox(width: Dimensions.paddingSizeSmall),
-              InkWell(
-                onTap: () => Get.toNamed(RouteHelper.getProfileRoute()),
-                child: Container(
-                  width: 35,
-                  height: 35,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
-                    shape: BoxShape.circle,
+                          ],
+                        );
+                      }),
+                    ),
                   ),
-                  child: Icon(Icons.person_sharp,
-                      size: 25, color: Theme.of(context).primaryColor),
                 ),
-              ),
-            ],
+                Row(
+                  children: [
+                    const BadWeatherWidget(),
+                    const SizedBox(width: Dimensions.paddingSizeSmall),
+                    InkWell(
+                      onTap: () => Get.toNamed(RouteHelper.getProfileRoute()),
+                      child: Container(
+                        width: 35,
+                        height: 35,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).cardColor,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(Icons.person_sharp,
+                            size: 25, color: Theme.of(context).primaryColor),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -118,7 +144,6 @@ class SwiggyHeaderWidget extends StatelessWidget {
   }
 }
 
-// --- KEEP YOUR SEARCH BAR AND DELEGATE CODE BELOW AS IS ---
 class SwiggySearchBarWidget extends StatelessWidget {
   final TextEditingController searchTextEditingController;
   const SwiggySearchBarWidget({super.key, required this.searchTextEditingController});
@@ -156,7 +181,6 @@ class SwiggySearchBarWidget extends StatelessWidget {
                       size: 20, color: Colors.grey),
                   const SizedBox(width: Dimensions.paddingSizeExtraSmall),
 
-                  // Rolling Text
                   Expanded(
                     child: ClipRect(
                       child: const RollingSearchText(),
@@ -232,7 +256,6 @@ class _RollingSearchTextState extends State<RollingSearchText> {
   int _index = 0;
   late Timer _timer;
 
-  // Your 5 words/phrases
   final List<String> _suggestions = [
     'Sweets',
     'Burgers',
@@ -244,7 +267,6 @@ class _RollingSearchTextState extends State<RollingSearchText> {
   @override
   void initState() {
     super.initState();
-    // Changes the word every 2 seconds
     _timer = Timer.periodic(const Duration(seconds: 2), (timer) {
       if (mounted) {
         setState(() {
@@ -273,7 +295,7 @@ class _RollingSearchTextState extends State<RollingSearchText> {
         ),
         Expanded(
           child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 500), // Speed of the swipe
+            duration: const Duration(milliseconds: 500),
             layoutBuilder: (currentChild, previousChildren) {
               return Stack(
                 alignment: Alignment.centerLeft,
@@ -284,18 +306,17 @@ class _RollingSearchTextState extends State<RollingSearchText> {
               );
             },
             transitionBuilder: (Widget child, Animation<double> animation) {
-              // Creates the "swipe up" effect
               return SlideTransition(
                 position: Tween<Offset>(
-                  begin: const Offset(0.0, 1.0), // Starts from below
-                  end: const Offset(0.0, 0.0),   // Ends at center
+                  begin: const Offset(0.0, 1.0),
+                  end: const Offset(0.0, 0.0),
                 ).animate(animation),
                 child: FadeTransition(opacity: animation, child: child),
               );
             },
             child: Text(
               '\'${_suggestions[_index]}\''.tr,
-              key: ValueKey(_suggestions[_index]), // Required for AnimatedSwitcher to trigger
+              key: ValueKey(_suggestions[_index]),
               style: robotoRegular.copyWith(
                 fontSize: Dimensions.fontSizeDefault,
                 color: Theme.of(context).hintColor,

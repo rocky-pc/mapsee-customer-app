@@ -8,6 +8,7 @@ import 'package:stackfood_multivendor/api/api_client.dart';
 import 'package:stackfood_multivendor/features/restaurant/domain/models/recommended_product_model.dart';
 import 'package:stackfood_multivendor/features/restaurant/domain/repositories/restaurant_repository_interface.dart';
 import 'package:stackfood_multivendor/util/app_constants.dart';
+import 'package:stackfood_multivendor/helper/address_helper.dart';
 import 'package:get/get_connect.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -95,54 +96,88 @@ class RestaurantRepository implements RestaurantRepositoryInterface {
   }
 
   @override
-  Future<RestaurantModel?> getList({int? offset, String? filterBy, int? topRated, int? discount, int? veg, int? nonVeg, bool fromMap = false, DataSourceEnum? source}) async {
+  Future<RestaurantModel?> getList({int? offset, String? filterBy, int? topRated, int? discount, int? veg, int? nonVeg, bool fromMap = false, double? pinLat, double? pinLng, int? radius, DataSourceEnum? source}) async {
     RestaurantModel? restaurantModel;
-    String cacheId = AppConstants.restaurantUri;
-
-    switch(source!){
+    // Include pin coordinates and radius in cache key when available to avoid serving stale cached results for different pin locations
+    String cacheId = AppConstants.restaurantUri + ((fromMap && pinLat != null && pinLng != null) ? '_pin_${pinLat.toStringAsFixed(6)}_${pinLng.toStringAsFixed(6)}_${(radius ?? 12000)}' : '');
+    switch(source!) {
       case DataSourceEnum.client:
-        Response response = await apiClient.getData('${AppConstants.restaurantUri}/all?offset=$offset&limit=${fromMap ? 20 : 12}&filter_data=$filterBy&top_rated=$topRated&discount=$discount&veg=$veg&non_veg=$nonVeg');
+        String uri = '${AppConstants.restaurantUri}/all?offset=$offset&limit=${fromMap ? 20 : 12}&filter_data=$filterBy&top_rated=$topRated&discount=$discount&veg=$veg&non_veg=$nonVeg';
+        Map<String, String>? headers;
+        if(fromMap) {
+          uri = uri + '&pin=1';
+          try {
+            // Prefer provided pin coordinates, fallback to saved address
+            if(pinLat != null && pinLng != null) {
+              headers = Map<String, String>.from(apiClient.getHeader());
+              headers['pin_lat'] = pinLat.toString();
+              headers['pin_lng'] = pinLng.toString();
+              headers['radius'] = (radius ?? 12000).toString();
+            } else {
+              final address = AddressHelper.getAddressFromSharedPref();
+              if(address != null) {
+                headers = Map<String, String>.from(apiClient.getHeader());
+                headers['pin_lat'] = address.latitude ?? '';
+                headers['pin_lng'] = address.longitude ?? '';
+                headers['radius'] = (radius ?? 12000).toString();
+              }
+            }
+          } catch (_) {}
+        }
+
+        Response response = await apiClient.getData(uri, headers: headers);
         if(response.statusCode == 200){
           restaurantModel = RestaurantModel.fromJson(response.body);
-          LocalClient.organize(DataSourceEnum.client, cacheId, jsonEncode(response.body), apiClient.getHeader());
+          LocalClient.organize(DataSourceEnum.client, cacheId, jsonEncode(response.body), headers ?? apiClient.getHeader());
         }
+        break;
       case DataSourceEnum.local:
         String? cacheResponseData = await LocalClient.organize(DataSourceEnum.local, cacheId, null, null);
         if(cacheResponseData != null) {
           restaurantModel = RestaurantModel.fromJson(jsonDecode(cacheResponseData));
         }
+        break;
     }
     return restaurantModel;
   }
 
   @override
-  Future<List<Restaurant>?> getRestaurantList({String? type, bool isRecentlyViewed = false, bool isOrderAgain = false, bool isPopular = false, bool isLatest = false, DataSourceEnum? source}) async {
+  Future<List<Restaurant>?> getRestaurantList({String? type, bool isRecentlyViewed = false, bool isOrderAgain = false, bool isPopular = false, bool isLatest = false, DataSourceEnum? source, double? pinLat, double? pinLng, int? radius}) async {
     if(isRecentlyViewed) {
       return _getRecentlyViewedRestaurantList(type!, source: source);
     } else if(isOrderAgain) {
       return _getOrderAgainRestaurantList(source: source);
     } else if(isPopular) {
-      return _getPopularRestaurantList(type!, source: source);
+      return _getPopularRestaurantList(type!, source: source, pinLat: pinLat, pinLng: pinLng, radius: radius);
     } else if(isLatest) {
-      return _getLatestRestaurantList(type!, source: source);
+      return _getLatestRestaurantList(type!, source: source, pinLat: pinLat, pinLng: pinLng, radius: radius);
     }
     return null;
   }
 
-  Future<List<Restaurant>?> _getLatestRestaurantList(String type, {DataSourceEnum? source}) async {
+  Future<List<Restaurant>?> _getLatestRestaurantList(String type, {DataSourceEnum? source, double? pinLat, double? pinLng, int? radius}) async {
     List<Restaurant>? latestRestaurantList;
-    String cacheId = AppConstants.latestRestaurantUri;
-
-    switch(source!){
+    String cacheId = AppConstants.latestRestaurantUri + ((pinLat != null && pinLng != null) ? '_pin_${pinLat.toStringAsFixed(6)}_${pinLng.toStringAsFixed(6)}_${(radius ?? 12000)}' : '');
+    switch(source!) {
       case DataSourceEnum.client:
-        Response response = await apiClient.getData('${AppConstants.latestRestaurantUri}?type=$type');
+        String uri = '${AppConstants.latestRestaurantUri}?type=$type';
+        Map<String, String>? headers;
+        if(pinLat != null && pinLng != null) {
+          uri = uri + '&pin=1';
+          headers = Map<String, String>.from(apiClient.getHeader());
+          headers['pin_lat'] = pinLat.toString();
+          headers['pin_lng'] = pinLng.toString();
+          headers['radius'] = (radius ?? 12000).toString();
+        }
+        Response response = await apiClient.getData(uri, headers: headers);
         if(response.statusCode == 200){
           latestRestaurantList = [];
           response.body.forEach((restaurant) {
             latestRestaurantList!.add(Restaurant.fromJson(restaurant));
           });
-          LocalClient.organize(DataSourceEnum.client, cacheId, jsonEncode(response.body), apiClient.getHeader());
+          LocalClient.organize(DataSourceEnum.client, cacheId, jsonEncode(response.body), headers ?? apiClient.getHeader());
         }
+        break;
       case DataSourceEnum.local:
         String? cacheResponseData = await LocalClient.organize(DataSourceEnum.local, cacheId, null, null);
         if(cacheResponseData != null) {
@@ -151,24 +186,34 @@ class RestaurantRepository implements RestaurantRepositoryInterface {
             latestRestaurantList!.add(Restaurant.fromJson(restaurant));
           });
         }
+        break;
     }
     return latestRestaurantList;
   }
 
-  Future<List<Restaurant>?> _getPopularRestaurantList(String type, {DataSourceEnum? source}) async {
+  Future<List<Restaurant>?> _getPopularRestaurantList(String type, {DataSourceEnum? source, double? pinLat, double? pinLng, int? radius}) async {
     List<Restaurant>? popularRestaurantList;
-    String cacheId = AppConstants.popularRestaurantUri;
-
-    switch(source!){
+    String cacheId = AppConstants.popularRestaurantUri + ((pinLat != null && pinLng != null) ? '_pin_${pinLat.toStringAsFixed(6)}_${pinLng.toStringAsFixed(6)}_${(radius ?? 12000)}' : '');
+    switch(source!) {
       case DataSourceEnum.client:
-        Response response = await apiClient.getData('${AppConstants.popularRestaurantUri}?type=$type');
+        String uri = '${AppConstants.popularRestaurantUri}?type=$type';
+        Map<String, String>? headers;
+        if(pinLat != null && pinLng != null) {
+          uri = uri + '&pin=1';
+          headers = Map<String, String>.from(apiClient.getHeader());
+          headers['pin_lat'] = pinLat.toString();
+          headers['pin_lng'] = pinLng.toString();
+          headers['radius'] = (radius ?? 12000).toString();
+        }
+        Response response = await apiClient.getData(uri, headers: headers);
         if(response.statusCode == 200){
           popularRestaurantList = [];
           response.body.forEach((restaurant) {
             popularRestaurantList!.add(Restaurant.fromJson(restaurant));
           });
-          LocalClient.organize(DataSourceEnum.client, cacheId, jsonEncode(response.body), apiClient.getHeader());
+          LocalClient.organize(DataSourceEnum.client, cacheId, jsonEncode(response.body), headers ?? apiClient.getHeader());
         }
+        break;
       case DataSourceEnum.local:
         String? cacheResponseData = await LocalClient.organize(DataSourceEnum.local, cacheId, null, null);
         if(cacheResponseData != null) {
@@ -177,6 +222,7 @@ class RestaurantRepository implements RestaurantRepositoryInterface {
             popularRestaurantList!.add(Restaurant.fromJson(restaurant));
           });
         }
+        break;
     }
 
     return popularRestaurantList;
@@ -239,5 +285,5 @@ class RestaurantRepository implements RestaurantRepositoryInterface {
     throw UnimplementedError();
   }
 
-  
+
 }

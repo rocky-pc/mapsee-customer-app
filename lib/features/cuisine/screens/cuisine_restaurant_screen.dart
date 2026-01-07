@@ -1,5 +1,9 @@
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:stackfood_multivendor/common/models/restaurant_model.dart';
 import 'package:stackfood_multivendor/features/cuisine/controllers/cuisine_controller.dart';
+import 'package:stackfood_multivendor/features/restaurant/controllers/restaurant_controller.dart';
 import 'package:stackfood_multivendor/helper/responsive_helper.dart';
+import 'package:stackfood_multivendor/util/app_constants.dart';
 import 'package:stackfood_multivendor/util/dimensions.dart';
 import 'package:stackfood_multivendor/common/widgets/custom_app_bar_widget.dart';
 import 'package:stackfood_multivendor/common/widgets/footer_view_widget.dart';
@@ -42,7 +46,27 @@ class _CuisineRestaurantScreenState extends State<CuisineRestaurantScreen> {
             child: SizedBox(
               width: Dimensions.webMaxWidth,
               child: GetBuilder<CuisineController>(builder: (cuisineController) {
-                if(cuisineController.cuisineRestaurantsModel != null){}
+
+                List<Restaurant>? restaurantList = cuisineController.cuisineRestaurantsModel?.restaurants;
+
+                if (restaurantList != null) {
+                  final restController = Get.find<RestaurantController>();
+                  restaurantList = restaurantList.where((restaurant) {
+                    if(restaurant.latitude != null && restaurant.longitude != null) {
+                      try {
+                        double distance = restController.getRestaurantDistance(LatLng(
+                          double.parse(restaurant.latitude!),
+                          double.parse(restaurant.longitude!),
+                        ));
+                        return distance <= AppConstants.restaurantActiveDistance;
+                      } catch (e) {
+                        return false;
+                      }
+                    }
+                    return false;
+                  }).toList();
+                }
+
                 return PaginatedListViewWidget(
                   scrollController: _scrollController,
                   totalSize: cuisineController.cuisineRestaurantsModel?.totalSize,
@@ -50,7 +74,7 @@ class _CuisineRestaurantScreenState extends State<CuisineRestaurantScreen> {
                   onPaginate: (int? offset) async => await cuisineController.getCuisineRestaurantList(widget.cuisineId, offset!, false),
                   productView: ProductViewWidget(
                     isRestaurant: true, products: null,
-                    restaurants: cuisineController.cuisineRestaurantsModel?.restaurants,
+                    restaurants: restaurantList,
                     padding: EdgeInsets.only(
                       left: ResponsiveHelper.isDesktop(context) ? Dimensions.paddingSizeExtraSmall : Dimensions.paddingSizeSmall,
                       right: ResponsiveHelper.isDesktop(context) ? Dimensions.paddingSizeExtraSmall : Dimensions.paddingSizeSmall,

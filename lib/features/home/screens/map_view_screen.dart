@@ -28,6 +28,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../../../api/api_client.dart';
+
 class MapViewScreen extends StatefulWidget {
   final bool fromDineInScreen;
   const MapViewScreen({super.key, this.fromDineInScreen = false});
@@ -43,6 +45,9 @@ class _MapViewScreenState extends State<MapViewScreen> {
   final CustomInfoWindowController _customInfoWindowController = CustomInfoWindowController();
   PageController? _pageController = PageController();
   bool _showLoading = true;
+  LatLng? _mapCenter; // current camera center for pinned searches
+
+
 
   @override
   void initState() {
@@ -55,7 +60,16 @@ class _MapViewScreenState extends State<MapViewScreen> {
     if(widget.fromDineInScreen){
       Get.find<DineInController>().getDineInRestaurantList(1, false);
     }else {
-      Get.find<RestaurantController>().getRestaurantList(1, false, fromMap: true);
+      // initialize map center from saved address and request restaurants with pin coords
+      final saved = AddressHelper.getAddressFromSharedPref();
+      if(saved != null) {
+        _mapCenter = LatLng(double.parse(saved.latitude!), double.parse(saved.longitude!));
+        try {
+          Get.find<ApiClient>().setPinLocation(_mapCenter?.latitude, _mapCenter?.longitude);
+        } catch(_) {}
+      }
+      debugPrint('====> Requesting restaurants for map center: ${_mapCenter?.latitude}, ${_mapCenter?.longitude}');
+      Get.find<RestaurantController>().getRestaurantList(1, false, fromMap: true, pinLat: _mapCenter?.latitude, pinLng: _mapCenter?.longitude);
     }
     Get.find<RestaurantController>().setNearestRestaurantIndex(-1, notify: false);
 
@@ -139,18 +153,32 @@ class _MapViewScreenState extends State<MapViewScreen> {
                         onTap: (position) {
                           _customInfoWindowController.hideInfoWindow!();
                           restController.setNearestRestaurantIndex(-1);
+                          _mapCenter = position;
+                          try { Get.find<ApiClient>().setPinLocation(_mapCenter?.latitude, _mapCenter?.longitude); } catch(_) {}
+                          debugPrint('====> Map tapped, requesting restaurants for: ${_mapCenter?.latitude}, ${_mapCenter?.longitude}');
+                          // User tapped map: refresh restaurants for tapped location
+                          Get.find<RestaurantController>().getRestaurantList(1, false, fromMap: true, pinLat: _mapCenter?.latitude, pinLng: _mapCenter?.longitude);
                         },
                         onCameraMove: (position) {
                           _customInfoWindowController.onCameraMove!();
+                          _mapCenter = position.target;
+                        },
+                        onCameraIdle: () async {
+                          try {
+                            Get.find<ApiClient>().setPinLocation(_mapCenter?.latitude, _mapCenter?.longitude);
+                          } catch (_) {}
+                          debugPrint('====> Camera idle, requesting restaurants for pin: ${_mapCenter?.latitude}, ${_mapCenter?.longitude}');
+                          // When camera stops moving, refresh the restaurant list using the camera center as pinned coords
+                          Get.find<RestaurantController>().getRestaurantList(1, false, fromMap: true, pinLat: _mapCenter?.latitude, pinLng: _mapCenter?.longitude);
                         },
                         onMapCreated: (GoogleMapController controller) {
                           _controller = controller;
                           _customInfoWindowController.googleMapController = controller;
 
                           if(widget.fromDineInScreen ? (dineInController.dineInModel != null && dineInController.dineInModel!.restaurants!.isNotEmpty)
-                            : (restController.restaurantModel != null && restController.restaurantModel!.restaurants!.isNotEmpty)) {
+                              : (restController.restaurantModel != null && restController.restaurantModel!.restaurants!.isNotEmpty)) {
                             GetPlatform.isWeb ? _setMarkerForWeb(widget.fromDineInScreen ? dineInController.dineInModel!.restaurants! : restController.restaurantModel!.restaurants!)
-                            : _setMarkers(widget.fromDineInScreen ? dineInController.dineInModel!.restaurants! : restController.restaurantModel!.restaurants!, false);
+                                : _setMarkers(widget.fromDineInScreen ? dineInController.dineInModel!.restaurants! : restController.restaurantModel!.restaurants!, false);
                           }
                         },
                         style: Get.isDarkMode ? Get.find<ThemeController>().darkMap : Get.find<ThemeController>().lightMap,
@@ -234,9 +262,9 @@ class _MapViewScreenState extends State<MapViewScreen> {
                 _customInfoWindowController.googleMapController = controller;
 
                 if(widget.fromDineInScreen ? (dineInController.dineInModel != null && dineInController.dineInModel!.restaurants!.isNotEmpty)
-                  : (restController.restaurantModel != null && restController.restaurantModel!.restaurants!.isNotEmpty)) {
+                    : (restController.restaurantModel != null && restController.restaurantModel!.restaurants!.isNotEmpty)) {
                   GetPlatform.isWeb ? _setMarkerForWeb(widget.fromDineInScreen ? dineInController.dineInModel!.restaurants! : restController.restaurantModel!.restaurants!)
-                  : _setMarkers(widget.fromDineInScreen ? dineInController.dineInModel!.restaurants! : restController.restaurantModel!.restaurants!, false);
+                      : _setMarkers(widget.fromDineInScreen ? dineInController.dineInModel!.restaurants! : restController.restaurantModel!.restaurants!, false);
                 }
               },
               style: Get.isDarkMode ? Get.find<ThemeController>().darkMap : Get.find<ThemeController>().lightMap,
@@ -300,7 +328,7 @@ class _MapViewScreenState extends State<MapViewScreen> {
                 onTap: () => _checkPermission(() async {
                   AddressModel address = await Get.find<LocationController>().getCurrentLocation(false, mapController: _controller);
                   GetPlatform.isWeb ? _setMarkerForWeb(widget.fromDineInScreen ? dineInController.dineInModel!.restaurants! : restController.restaurantModel!.restaurants!)
-                  : _setMarkers(widget.fromDineInScreen ? dineInController.dineInModel!.restaurants! : restController.restaurantModel!.restaurants!, false, address: address);
+                      : _setMarkers(widget.fromDineInScreen ? dineInController.dineInModel!.restaurants! : restController.restaurantModel!.restaurants!, false, address: address);
                 }),
                 child: Container(
                   padding: const EdgeInsets.all( Dimensions.paddingSizeSmall),
@@ -321,7 +349,7 @@ class _MapViewScreenState extends State<MapViewScreen> {
                 child: PageView.builder(
                   onPageChanged: (int index) {
                     // restController.setNearestRestaurantIndex(index);
-                   _animateMarker(widget.fromDineInScreen ? dineInController.dineInModel!.restaurants![index] : restController.restaurantModel!.restaurants![index], index);
+                    _animateMarker(widget.fromDineInScreen ? dineInController.dineInModel!.restaurants![index] : restController.restaurantModel!.restaurants![index], index);
                   },
                   scrollDirection: Axis.horizontal,
                   controller: _pageController,
@@ -383,10 +411,10 @@ class _MapViewScreenState extends State<MapViewScreen> {
         onTap: () {
           _customInfoWindowController.addInfoWindow!(MapCustomInfoWindowWidget(
               userInfoModel: Get.find<ProfileController>().userInfoModel),
-              LatLng(
-                double.parse(AddressHelper.getAddressFromSharedPref()!.latitude!),
-                double.parse(AddressHelper.getAddressFromSharedPref()!.longitude!),
-              ),
+            LatLng(
+              double.parse(AddressHelper.getAddressFromSharedPref()!.latitude!),
+              double.parse(AddressHelper.getAddressFromSharedPref()!.longitude!),
+            ),
           );
         },
         icon: myLocationMarkerIcon,
@@ -451,7 +479,7 @@ class _MapViewScreenState extends State<MapViewScreen> {
       _markers.add(Marker(markerId: MarkerId('id-$index0'), position: latLng, onTap: () {
         _animateMarker(restaurants[index], index);
       },
-       icon: BitmapDescriptor.defaultMarker,
+        icon: BitmapDescriptor.defaultMarker,
         infoWindow: InfoWindow(
           title: '${restaurants[index].name}',
           onTap: () {

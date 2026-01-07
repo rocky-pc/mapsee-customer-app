@@ -14,6 +14,9 @@ class CouponController extends GetxController implements GetxService {
   List<CouponModel>? _couponList;
   List<CouponModel>? get couponList => _couponList;
 
+  // Cache restaurant-specific coupon lists to avoid global state mutation when fetching coupons for many restaurants simultaneously
+  final Map<int, List<CouponModel>?> _restaurantCoupons = {};
+
   CustomerCouponModel? _customerCouponModel;
   CustomerCouponModel? get customerCouponModel => _customerCouponModel;
 
@@ -43,9 +46,25 @@ class CouponController extends GetxController implements GetxService {
     update();
   }
 
-  Future<void> getRestaurantCouponList({required int restaurantId}) async {
-    _couponList = await couponServiceInterface.getRestaurantCouponList(restaurantId: restaurantId);
-    update();
+  Future<List<CouponModel>?> getRestaurantCouponList({required int restaurantId, bool setActive = true, bool forceRefresh = false}) async {
+    // Return cached value if available unless forceRefresh is true
+    if (!forceRefresh && _restaurantCoupons.containsKey(restaurantId)) {
+      if (setActive) {
+        _couponList = _restaurantCoupons[restaurantId];
+        update();
+      }
+      return _restaurantCoupons[restaurantId];
+    }
+
+    final List<CouponModel>? list = await couponServiceInterface.getRestaurantCouponList(restaurantId: restaurantId);
+    _restaurantCoupons[restaurantId] = list;
+
+    if (setActive) {
+      _couponList = list;
+      update();
+    }
+
+    return list;
   }
 
   Future<double?> applyCoupon(String coupon, double order, double deliveryCharge, double charge, double total, int? restaurantID, {bool hideBottomSheet = false}) async {

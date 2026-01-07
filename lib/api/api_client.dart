@@ -57,6 +57,27 @@ class ApiClient extends GetxService {
 
   Map<String, String> getHeader() => _mainHeaders;
 
+  /// Set or clear pinned location headers used for pinned-radius searches
+  Map<String, String> setPinLocation(double? pinLat, double? pinLng, {int radius = 12000, bool setHeader = true}) {
+    if(pinLat != null && pinLng != null) {
+      _mainHeaders['pin_lat'] = pinLat.toString();
+      _mainHeaders['pin_lng'] = pinLng.toString();
+      _mainHeaders['radius'] = radius.toString();
+    } else {
+      // clear pin headers
+      _mainHeaders.remove('pin_lat');
+      _mainHeaders.remove('pin_lng');
+      _mainHeaders.remove('radius');
+    }
+    if(setHeader) {
+      // already mutated _mainHeaders in-place
+    }
+    if(kDebugMode) {
+      debugPrint('====> Pin headers set: pin_lat=${_mainHeaders['pin_lat']}, pin_lng=${_mainHeaders['pin_lng']}, radius=${_mainHeaders['radius']}');
+    }
+    return _mainHeaders;
+  }
+
   Future<Response> getData(String uri, {Map<String, dynamic>? query, Map<String, String>? headers, bool handleError = true, bool showToaster = false}) async {
     // PREVENT API CALL IF LAT/LNG IS 0.0 TO REDUCE SERVER LOAD AND LOG NOISE
     if(uri.contains('geocode-api?lat=0.0&lng=0.0')) {

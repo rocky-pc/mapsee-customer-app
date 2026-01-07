@@ -11,6 +11,7 @@ class Images {
   static const String bengali = 'assets/image/bangla.png';
   static const String call = 'assets/image/call.png';
   static const String checked = 'assets/image/checked.png';
+  static const String snowflake = 'assets/image/snowflake.png';
   static const String english = 'assets/image/english.png';
   static const String locationMarker = 'assets/image/location_marker.png';
   static const String lock = 'assets/image/lock.png';
